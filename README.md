@@ -42,3 +42,4 @@ npm run dev
 ## ESLint (Microsoft)
 
 ## Prettier - Code formatter (Esben Petersen)
+# operations-frontend
