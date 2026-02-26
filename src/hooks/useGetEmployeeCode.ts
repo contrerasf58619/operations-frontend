@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 
 export const useGetEmployeeCode = () => {
-    const [employeeCode, setEmployeeCode] = useState<string | undefined>(undefined)
+    const [employeeCode, setEmployeeCode] = useState<number>()
 
     useEffect(() => {
         const interval = setInterval(() => {
             const employeeCodeCookie = Cookies.get('employeeCode')
-
+            const employeeCode = employeeCodeCookie ? + employeeCodeCookie : 0
             if (employeeCodeCookie) {
-                setEmployeeCode(employeeCodeCookie)
+                setEmployeeCode(employeeCode)
                 clearInterval(interval)
             }
         }, 500)

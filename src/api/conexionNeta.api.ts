@@ -9,9 +9,9 @@ if (!api) {
     throw new Error('Please define NEXT_PUBLIC_URL_UAD_NEST in your .env file')
 }
 
-export const uadApi = {
-    getUADs(employeeId: number) {
-        const route = baseURL(api, 'uads/uads-by-roster',{employeeId})
+export const conexionNetaApi = {
+    getConexionNeta(startDate: string, endDate: string, uadId: number) {
+        const route = baseURL(api, 'conexion-neta/gt',{startDate, endDate, uadId})
         return axios.get(route, { headers: getHeaders() })
     }
 }

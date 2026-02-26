@@ -1,3 +1,3 @@
-import { GeneralReport } from '@/components/reports/general'
+import { GeneralReport } from '@/components/reports/General'
 
 export default GeneralReport
