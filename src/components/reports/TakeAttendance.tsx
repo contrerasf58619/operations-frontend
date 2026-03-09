@@ -11,7 +11,7 @@ import { usePayrollPeriods } from '@/hooks/attendance/usePayrollPeriods'
 import { useAttendanceTypes } from '@/hooks/attendance/useAttendanceTypes'
 import { useLeaders } from '@/hooks/attendance/useLeaders'
 import { useTeamAttendances } from '@/hooks/attendance/useTeamAttendances'
-import { AttendanceTable } from './AttendanceTable'
+import { AttendanceTable } from '../UI/AttendanceTable'
 
 const TakeAttendance: React.FC = () => {
   const [selectedUad, setSelectedUad] = useState<string>('') // administrative unit selected from UadList
@@ -46,7 +46,7 @@ const TakeAttendance: React.FC = () => {
     saving,
     handleAttendanceChange,
     handleSaveAll,
-  } = useTeamAttendances(selectedLeader, selectedUad, startDate, endDate, setLoadingPage)
+  } = useTeamAttendances(selectedLeader, selectedUad, startDate, endDate, setLoadingPage, employeeCode)
 
   const getDatesInRange = useCallback((): Dayjs[] => {
     if (!startDate || !endDate) return []

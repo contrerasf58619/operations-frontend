@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { Dayjs } from 'dayjs'
 import { User, AttendanceType } from '@/interfaces/takeAttendance.interface'
-import { Loading } from '../UI/Loading'
+import { Loading } from './Loading'
 
 interface AttendanceTableProps {
   users: User[]

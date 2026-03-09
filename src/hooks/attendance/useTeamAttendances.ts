@@ -11,7 +11,8 @@ export const useTeamAttendances = (
   selectedUad: string,
   startDate: string,
   endDate: string,
-  setLoadingPage: (loading: boolean) => void
+  setLoadingPage: (loading: boolean) => void,
+  employeeCode: string | undefined,
 ) => {
   const [users, setUsers] = useState<User[]>([])
   const [attendancesByUser, setAttendancesByUser] = useState<{ agent_roster: number; name: string, fechas: { fecha: string, attendance_type: string | null, weekend: boolean }[] }[]>([])
@@ -100,7 +101,7 @@ export const useTeamAttendances = (
   const handleSaveAll = useCallback(async () => {
     const userPayload: AttendancePayload = {
       uadId: selectedUad,
-      responsable: '58619', // Default or currently logged in responsible id
+      responsable: employeeCode, // Default or currently logged in responsible id
       attendances: attendancesByUser
     }
     setSaving(true)

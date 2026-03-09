@@ -34,7 +34,7 @@ export const useLeaders = (selectedUad: string, startDate: string, endDate: stri
         const data = res.data || []
         data.sort((a: Leader, b: Leader) => a.name.localeCompare(b.name))
         setLeaders(data)
-        const currentLeader = data.find((leader: Leader) => leader.sup_code == '58619')
+        const currentLeader = data.find((leader: Leader) => leader.sup_code == employeeCode)
         if (currentLeader) {
           setSelectedLeader(currentLeader.sup_code)
         }
