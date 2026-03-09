@@ -10,8 +10,9 @@ if (!api) {
 }
 
 export const uadApi = {
-    getUADs() {
-        const route = baseURL(api, 'uads/uads-by-roster',{employeeId: 58619})
+
+    getUADs(employeeId?: string) {
+        const route = baseURL(api, 'uads/uads-by-roster', { employeeId: employeeId })
         return axios.get(route, { headers: getHeaders() })
     }
-}
+}j

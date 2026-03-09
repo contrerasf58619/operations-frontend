@@ -23,7 +23,7 @@ export const catalogsApi = {
         const route = baseURL(api, 'menu/routeRelative')
         return axios.get(route, { headers: getHeaders() })
     },
-    getMenus(employeeCode?: number) {
+    getMenus(employeeCode?: string) {
         const route = baseURL(api, 'menu/privileges', { appId, employeeCode })
         return axios.get(route, { headers: getHeaders() })
     },
