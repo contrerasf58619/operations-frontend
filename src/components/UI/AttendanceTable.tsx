@@ -74,10 +74,11 @@ export const AttendanceTable: FC<AttendanceTableProps> = ({
                           className="px-1 py-3 text-center border-l border-gray-300"
                         >
                           <select
+                            disabled={!attendanceRecord}
                             title={attendanceRecord?.attendance_type ? attendanceRecord?.attendance_type : attendanceRecord?.weekend ? 'ddd' : 'x'}
                             value={attendanceRecord?.attendance_type ? attendanceRecord?.attendance_type : attendanceRecord?.weekend ? 'ddd' : 'x'}
                             onChange={(e) => handleAttendanceChange(user.agent_roster, dateStr, e.target.value)}
-                            className="w-full px-1 py-1 rounded font-medium text-xs transition-all bg-white text-gray-900 border border-gray-300 hover:bg-gray-50"
+                            className="w-full px-1 py-1 rounded font-medium text-xs transition-all bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                           >
                             <option value="">-</option>
                             {attendanceStatuses.map((status) => (

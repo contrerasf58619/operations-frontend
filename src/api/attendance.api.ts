@@ -10,7 +10,7 @@ if (!api) {
 
 export interface AttendancePayload {
     uadId: string,
-    responsable: string,
+    responsable: string | undefined,
     attendances: {
         agent_roster: number,
         name: string,
@@ -23,8 +23,8 @@ export interface AttendancePayload {
 }
 
 export interface PayrollPeriod {
-  date_from: string;
-  date_to: string;
+    date_from: string;
+    date_to: string;
 }
 
 export const attendanceApi = {
@@ -38,7 +38,7 @@ export const attendanceApi = {
     },
     getPayrollNextDates(payload = {}) {
         const route = baseURL(api, 'attendances/get-payroll-next-dates')
-        return axios.get<PayrollPeriod[]>(route, { headers: getHeaders(), params: payload }) 
+        return axios.get<PayrollPeriod[]>(route, { headers: getHeaders(), params: payload })
     },
 
     getAttendanceTypes(payload = {}) {

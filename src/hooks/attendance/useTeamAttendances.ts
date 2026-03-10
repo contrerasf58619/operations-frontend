@@ -83,11 +83,11 @@ export const useTeamAttendances = (
   const handleAttendanceChange = useCallback((agent_roster: number, date: string, value: string) => {
     setAttendancesByUser((prevAttendances) =>
       prevAttendances.map((user) => {
-        if (user.agent_roster === agent_roster) {
+        if (user.agent_roster == agent_roster) {
           return {
             ...user,
             fechas: user.fechas.map((fecha) =>
-              fecha.fecha.substring(0, 10) === date
+              fecha.fecha.substring(0, 10) == date
                 ? { ...fecha, attendance_type: value }
                 : fecha
             ),
