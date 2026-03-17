@@ -77,7 +77,7 @@ const TakeAttendance: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <label className="block text-sm font-semibold text-gray-900 mb-4">
-                Unidad Administrativa
+                UAD
               </label>
               <div className="space-y-4">
                 <UadList value={selectedUad} onChange={(v) => setSelectedUad(v)} />
