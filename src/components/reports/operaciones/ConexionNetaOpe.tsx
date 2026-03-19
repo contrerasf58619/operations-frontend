@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
 import { COLUMN_DEFINITIONS } from './utils/columns-cno'
 
-const ROWS_PER_PAGE = 5
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
 
 const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'CONEXION_NETA']
 
@@ -42,6 +42,7 @@ export const ConexionNetaOpe = () => {
     const { data, dataGT, loading, loadingGT, error, fetchConexionNeta, fetchConexionNetaGT } =
         useConexionNetaOpe()
     const [currentPage, setCurrentPage] = useState(1)
+    const [rowsPerPage, setRowsPerPage] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(20)
     const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
 
     useEffect(() => {
@@ -70,17 +71,17 @@ export const ConexionNetaOpe = () => {
         return [...activeRows].sort(sortRowsByRoster)
     }, [activeRows])
 
-    const totalPages = Math.max(1, Math.ceil(sortedRows.length / ROWS_PER_PAGE))
+    const totalPages = Math.max(1, Math.ceil(sortedRows.length / rowsPerPage))
 
-    // Reset to page 1 whenever the dataset changes
+    // Reset to page 1 whenever dataset or page size changes
     useEffect(() => {
         setCurrentPage(1)
-    }, [sortedRows])
+    }, [sortedRows, rowsPerPage])
 
     const pagedRows = useMemo(() => {
-        const start = (currentPage - 1) * ROWS_PER_PAGE
-        return sortedRows.slice(start, start + ROWS_PER_PAGE)
-    }, [sortedRows, currentPage])
+        const start = (currentPage - 1) * rowsPerPage
+        return sortedRows.slice(start, start + rowsPerPage)
+    }, [sortedRows, currentPage, rowsPerPage])
 
     const visibleColumns = useMemo(() => {
         if (sortedRows.length === 0) {
@@ -94,8 +95,8 @@ export const ConexionNetaOpe = () => {
 
     const summary = useMemo(() => {
         const uniqueRosters = new Set(sortedRows.map(row => row.ROSTER)).size
-        const pageStart = (currentPage - 1) * ROWS_PER_PAGE + 1
-        const pageEnd = Math.min(currentPage * ROWS_PER_PAGE, sortedRows.length)
+        const pageStart = (currentPage - 1) * rowsPerPage + 1
+        const pageEnd = Math.min(currentPage * rowsPerPage, sortedRows.length)
 
         return {
             totalRows: sortedRows.length,
@@ -200,20 +201,37 @@ export const ConexionNetaOpe = () => {
                     </table>
                 </div>
 
-                <div className='px-6 py-3 bg-background-light border-t border-slate-200'>
+                <div className='flex flex-col gap-3 px-6 py-3 bg-background-light border-t border-slate-200 sm:flex-row sm:items-center sm:justify-between'>
                     <p className='text-sm text-slate-600'>
                         Mostrando{' '}
                         <span className='font-semibold text-charcoal'>{summary.pageStart}</span>
                         {' – '}
                         <span className='font-semibold text-charcoal'>{summary.pageEnd}</span>
                         {' de '}
-                        <span className='font-semibold text-charcoal'>
-                            {summary.totalRows}
-                        </span>{' '}
-                        registros &nbsp;·&nbsp;{' '}
-                        <span className='font-semibold text-charcoal'>{summary.uniqueRosters}</span>{' '}
-                        rosters
+                        <span className='font-semibold text-charcoal'>{summary.totalRows}</span>
+                        {' registros \u00a0·\u00a0 '}
+                        <span className='font-semibold text-charcoal'>{summary.uniqueRosters}</span>
+                        {' rosters'}
                     </p>
+
+                    <label className='flex items-center gap-2 text-sm text-slate-600 whitespace-nowrap'>
+                        Filas por página
+                        <select
+                            value={rowsPerPage}
+                            onChange={e =>
+                                setRowsPerPage(
+                                    Number(e.target.value) as (typeof PAGE_SIZE_OPTIONS)[number],
+                                )
+                            }
+                            className='rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm font-semibold text-charcoal focus:outline-none focus:ring-2 focus:ring-cyan'
+                        >
+                            {PAGE_SIZE_OPTIONS.map(size => (
+                                <option key={size} value={size}>
+                                    {size}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
                 </div>
 
                 <div
@@ -257,12 +275,12 @@ export const ConexionNetaOpe = () => {
             <div className='mt-8 grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='rounded-2xl border border-cyan bg-background-light p-6 shadow-sm'>
                     <div className='flex items-center gap-3 mb-3'>
-                        <span className='material-symbols-outlined text-cyan'>dashboard</span>
+                        {/* <span className='material-symbols-outlined text-cyan'>dashboard</span> */}
                         <h3 className='font-semibold text-charcoal'>Columnas Dinámicas</h3>
                     </div>
                     <p className='text-sm text-slate-600 leading-relaxed'>
-                        Las columnas se muestran únicamente cuando el endpoint retorna datos para
-                        ellas. Las columnas vacías se ocultan automáticamente.
+                        Las columnas se muestran únicamente cuando la data termine de cargar y
+                        retorna datos para ellas. Las columnas vacías se ocultan automáticamente.
                     </p>
                 </div>
 
