@@ -405,39 +405,6 @@ export const ConexionNetaOpe = () => {
             </div>
 
             <div className='bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
-                <div className='flex flex-col gap-3 border-b border-slate-200 bg-background-light px-6 py-4 lg:flex-row lg:items-center lg:justify-between'>
-                    <div>
-                        <p className='text-sm font-semibold text-charcoal'>Navegacion Horizontal</p>
-                        <p className='text-xs text-slate-500'>
-                            Usa los botones para avanzar o regresar entre columnas.
-                        </p>
-                    </div>
-                    <div className='flex items-center gap-2 self-start lg:self-auto'>
-                        <button
-                            type='button'
-                            onClick={() => scrollTable('back')}
-                            disabled={!canScrollBack}
-                            className='inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-charcoal transition hover:border-cyan hover:text-teal disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400'
-                        >
-                            <span className='material-symbols-outlined text-base'>
-                                chevron_left
-                            </span>
-                            Back
-                        </button>
-                        <button
-                            type='button'
-                            onClick={() => scrollTable('next')}
-                            disabled={!canScrollNext}
-                            className='inline-flex items-center gap-2 rounded-lg border border-primary-border bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400'
-                        >
-                            Next
-                            <span className='material-symbols-outlined text-base'>
-                                chevron_right
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
                 <div ref={tableScrollRef} className='overflow-x-auto'>
                     <table className='min-w-full text-left border-collapse'>
                         <thead>
@@ -522,6 +489,42 @@ export const ConexionNetaOpe = () => {
                         <span className='font-semibold text-charcoal'>{summary.uniqueRosters}</span>{' '}
                         rosters
                     </p>
+                </div>
+
+                <div
+                    id='navigation-horizontal'
+                    className='flex flex-col gap-3 border-b border-slate-200 bg-background-light px-6 py-4 lg:flex-row lg:items-center lg:justify-between'
+                >
+                    <div>
+                        <p className='text-sm font-semibold text-charcoal'>Navegacion Horizontal</p>
+                        <p className='text-xs text-slate-500'>
+                            Usa los botones para avanzar o regresar entre columnas.
+                        </p>
+                    </div>
+                    <div className='flex items-center gap-2 self-start lg:self-auto'>
+                        <button
+                            type='button'
+                            onClick={() => scrollTable('back')}
+                            disabled={!canScrollBack}
+                            className='inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-charcoal transition hover:border-cyan hover:text-teal disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400'
+                        >
+                            <span className='material-symbols-outlined text-base'>
+                                chevron_left
+                            </span>
+                            Back
+                        </button>
+                        <button
+                            type='button'
+                            onClick={() => scrollTable('next')}
+                            disabled={!canScrollNext}
+                            className='inline-flex items-center gap-2 rounded-lg border border-primary-border bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400'
+                        >
+                            Next
+                            <span className='material-symbols-outlined text-base'>
+                                chevron_right
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
