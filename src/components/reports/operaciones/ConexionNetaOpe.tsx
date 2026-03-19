@@ -18,6 +18,33 @@ const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
 
 const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'CONEXION_NETA']
 
+const GROUPED_COLUMN_IDS = new Set<keyof ConexionNetaOpeDatum>([
+    'WP_HOURS',
+    'LAW_HOURS',
+    'CALCULATED_LAW_HOURS',
+])
+
+type CellMeta = { render: boolean; rowspan: number }
+
+function computeGroupMeta(
+    rows: ConexionNetaOpeDatum[],
+    columnId: keyof ConexionNetaOpeDatum,
+): CellMeta[] {
+    const meta: CellMeta[] = rows.map(() => ({ render: true, rowspan: 1 }))
+
+    for (let i = rows.length - 1; i > 0; i--) {
+        const sameRoster = rows[i].ROSTER === rows[i - 1].ROSTER
+        const sameValue = String(rows[i][columnId]) === String(rows[i - 1][columnId])
+
+        if (sameRoster && sameValue) {
+            meta[i].render = false
+            meta[i - 1].rowspan += meta[i].rowspan
+        }
+    }
+
+    return meta
+}
+
 function hasValue(value: unknown) {
     return value !== null && value !== undefined && String(value).trim() !== ''
 }
@@ -95,6 +122,14 @@ export const ConexionNetaOpe = () => {
         const start = (currentPage - 1) * rowsPerPage
         return filteredRows.slice(start, start + rowsPerPage)
     }, [filteredRows, currentPage, rowsPerPage])
+
+    const groupMeta = useMemo(() => {
+        const map = new Map<keyof ConexionNetaOpeDatum, CellMeta[]>()
+        for (const colId of GROUPED_COLUMN_IDS) {
+            map.set(colId, computeGroupMeta(pagedRows, colId))
+        }
+        return map
+    }, [pagedRows])
 
     const visibleColumns = useMemo(() => {
         if (sortedRows.length === 0) {
@@ -227,16 +262,44 @@ export const ConexionNetaOpe = () => {
                                         key={`${row.ROSTER}-${row.FECHA}-${rowIndex}`}
                                         className='transition-colors hover:bg-background-light/60'
                                     >
-                                        {visibleColumns.map(column => (
-                                            <td
-                                                key={`${column.id}-${rowIndex}`}
-                                                className={`px-6 py-4 text-sm text-slate-600 align-middle ${
-                                                    column.cellClassName ?? ''
-                                                }`}
-                                            >
-                                                {column.render(row)}
-                                            </td>
-                                        ))}
+                                        {visibleColumns.map(column => {
+                                            const colId =
+                                                column.id as keyof ConexionNetaOpeDatum
+
+                                            if (GROUPED_COLUMN_IDS.has(colId)) {
+                                                const meta =
+                                                    groupMeta.get(colId)?.[rowIndex]
+
+                                                if (!meta?.render) return null
+
+                                                return (
+                                                    <td
+                                                        key={`${column.id}-${rowIndex}`}
+                                                        rowSpan={meta.rowspan}
+                                                        className={`px-6 py-4 text-sm text-slate-600 align-middle ${
+                                                            column.cellClassName ?? ''
+                                                        } ${
+                                                            meta.rowspan > 1
+                                                                ? 'border-l border-r border-slate-100 bg-slate-50/40'
+                                                                : ''
+                                                        }`}
+                                                    >
+                                                        {column.render(row)}
+                                                    </td>
+                                                )
+                                            }
+
+                                            return (
+                                                <td
+                                                    key={`${column.id}-${rowIndex}`}
+                                                    className={`px-6 py-4 text-sm text-slate-600 align-middle ${
+                                                        column.cellClassName ?? ''
+                                                    }`}
+                                                >
+                                                    {column.render(row)}
+                                                </td>
+                                            )
+                                        })}
                                     </tr>
                                 ))}
                         </tbody>
