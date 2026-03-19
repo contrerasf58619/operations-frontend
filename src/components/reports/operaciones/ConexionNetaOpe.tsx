@@ -9,6 +9,7 @@ import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type { ConexionNetaOpeDatum } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
 import { useEffect, useMemo, useState } from 'react'
+import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
 import { COLUMN_DEFINITIONS } from './utils/columns-cno'
 
 const ROWS_PER_PAGE = 5
@@ -22,6 +23,18 @@ function hasValue(value: unknown) {
 function sortRowsByRoster(leftRow: ConexionNetaOpeDatum, rightRow: ConexionNetaOpeDatum) {
     return Number(leftRow.ROSTER) - Number(rightRow.ROSTER)
 }
+
+const baseBtn =
+    'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1'
+
+const primaryBtn =
+    'bg-orange-500 text-white border border-orange-500 hover:bg-orange-600 hover:border-orange-600 active:scale-[0.98]'
+
+const secondaryBtn =
+    'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400 active:scale-[0.98]'
+
+const disabledBtn =
+    'cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-100 hover:border-slate-200 active:scale-100'
 
 export const ConexionNetaOpe = () => {
     const { selectedUad } = useUadContext()
@@ -218,17 +231,24 @@ export const ConexionNetaOpe = () => {
                             type='button'
                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             disabled={currentPage <= 1}
-                            className='inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-charcoal transition hover:border-cyan hover:text-teal disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400'
+                            className={`${baseBtn} ${
+                                currentPage <= 1 ? disabledBtn : secondaryBtn
+                            }`}
                         >
+                            <MdChevronLeft size={18} />
                             Back
                         </button>
+
                         <button
                             type='button'
                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentPage >= totalPages}
-                            className='inline-flex items-center gap-1.5 rounded-lg border border-primary-border bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400'
+                            className={`${baseBtn} ${
+                                currentPage >= totalPages ? disabledBtn : primaryBtn
+                            }`}
                         >
                             Next
+                            <MdChevronRight size={18} />
                         </button>
                     </div>
                 </div>
