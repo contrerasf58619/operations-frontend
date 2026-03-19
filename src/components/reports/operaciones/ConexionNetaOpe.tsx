@@ -6,372 +6,268 @@ import { CustomDatePicker } from '@/components/UI/DateTimePicker'
 import { useDateContext } from '@/context/UI/DateContext'
 import { useUadContext } from '@/context/uad/UadContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
-import type { ConexionNetaOpeRow } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
+import type { ConexionNetaOpeDatum } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-type RowKey = keyof ConexionNetaOpeRow
+type RowKey = keyof ConexionNetaOpeDatum
 
 type TableColumn = {
     id: string
     label: string
     sourceKeys: RowKey[]
-    render: (row: ConexionNetaOpeRow) => ReactNode
+    render: (row: ConexionNetaOpeDatum) => ReactNode
     headerClassName?: string
     cellClassName?: string
 }
 
-const FALLBACK_COLUMN_IDS = ['Codigo_Agente', 'Nombre_Agente', 'Fecha', 'Horario', 'Conexion_neta']
+const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'CONEXION_NETA']
+
 function hasValue(value: unknown) {
     return value !== null && value !== undefined && String(value).trim() !== ''
 }
 
-function parseNumericValue(value: unknown) {
-    if (typeof value === 'number') {
-        return Number.isFinite(value) ? value : 0
-    }
-
-    if (typeof value !== 'string') {
-        return 0
-    }
-
-    const normalizedValue = value.replace(/,/g, '').trim()
-    const parsedValue = Number(normalizedValue)
-
-    return Number.isFinite(parsedValue) ? parsedValue : 0
-}
-
-function formatNumericValue(value: unknown) {
+function formatValue(value: unknown) {
     if (!hasValue(value)) {
         return '--'
-    }
-
-    const parsedValue = parseNumericValue(value)
-
-    if (parsedValue !== 0 || String(value).trim() === '0' || String(value).trim() === '0.00') {
-        return parsedValue.toFixed(2)
     }
 
     return String(value)
 }
 
-function formatDateValue(value: string) {
-    if (!hasValue(value)) {
-        return '--'
-    }
-
-    const isoDateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/)
-
-    if (isoDateMatch) {
-        const [, year, month, day] = isoDateMatch
-        return `${day}/${month}/${year}`
-    }
-
-    const parsedDate = new Date(value)
-
-    if (!Number.isNaN(parsedDate.getTime())) {
-        return parsedDate.toLocaleDateString('es-GT', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        })
-    }
-
-    return value
-}
-
-function formatTimeValue(value: string | null | undefined) {
-    if (!hasValue(value)) {
-        return '--'
-    }
-
-    const timeMatch = String(value).match(/(?:T|\s)?(\d{2}):(\d{2})/)
-
-    if (timeMatch) {
-        return `${timeMatch[1]}:${timeMatch[2]}`
-    }
-
-    const parsedDate = new Date(String(value))
-
-    if (!Number.isNaN(parsedDate.getTime())) {
-        return parsedDate.toLocaleTimeString('es-GT', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-        })
-    }
-
-    return String(value)
-}
-
-function formatSchedule(fromTime: string | null, toTime: string | null) {
-    if (!hasValue(fromTime) && !hasValue(toTime)) {
-        return '--'
-    }
-
-    return `${formatTimeValue(fromTime)} - ${formatTimeValue(toTime)}`
-}
-
-function sortRowsByRosterAndDate(leftRow: ConexionNetaOpeRow, rightRow: ConexionNetaOpeRow) {
-    const rosterDifference = Number(leftRow.Codigo_Agente) - Number(rightRow.Codigo_Agente)
-
-    if (rosterDifference !== 0) {
-        return rosterDifference
-    }
-
-    const leftDate = new Date(leftRow.Fecha).getTime()
-    const rightDate = new Date(rightRow.Fecha).getTime()
-
-    if (!Number.isNaN(leftDate) && !Number.isNaN(rightDate)) {
-        return leftDate - rightDate
-    }
-
-    return String(leftRow.Fecha).localeCompare(String(rightRow.Fecha))
-}
-
-function shouldMergeWeeklyTotal(
-    currentRow: ConexionNetaOpeRow,
-    nextRow: ConexionNetaOpeRow | undefined,
-) {
-    if (!nextRow) {
-        return false
-    }
-
-    return (
-        currentRow.Codigo_Agente === nextRow.Codigo_Agente &&
-        currentRow.Conexion_Neta_Semana === nextRow.Conexion_Neta_Semana
-    )
+function sortRowsByRoster(leftRow: ConexionNetaOpeDatum, rightRow: ConexionNetaOpeDatum) {
+    return Number(leftRow.ROSTER) - Number(rightRow.ROSTER)
 }
 
 const COLUMN_DEFINITIONS: TableColumn[] = [
     {
-        id: 'Codigo_Agente',
+        id: 'ROSTER',
         label: 'Roster',
-        sourceKeys: ['Codigo_Agente'],
-        render: row => row.Codigo_Agente,
+        sourceKeys: ['ROSTER'],
+        render: row => row.ROSTER,
         cellClassName: 'font-semibold text-charcoal whitespace-nowrap',
     },
     {
-        id: 'Nombre_Agente',
+        id: 'NOMBRE',
         label: 'Nombre',
-        sourceKeys: ['Nombre_Agente'],
-        render: row => row.Nombre_Agente,
+        sourceKeys: ['NOMBRE'],
+        render: row => row.NOMBRE,
         cellClassName: 'min-w-[220px]',
     },
     {
-        id: 'Fecha',
+        id: 'FECHA',
         label: 'Fecha',
-        sourceKeys: ['Fecha'],
-        render: row => formatDateValue(row.Fecha),
+        sourceKeys: ['FECHA'],
+        render: row => formatValue(row.FECHA),
         cellClassName: 'whitespace-nowrap',
     },
     {
-        id: 'Asistencia_Planificacion',
+        id: 'NOMENCLATURA',
         label: 'Nomenclatura',
-        sourceKeys: ['Asistencia_Planificacion'],
-        render: row => row.Asistencia_Planificacion || '--',
+        sourceKeys: ['NOMENCLATURA'],
+        render: row => formatValue(row.NOMENCLATURA),
         cellClassName: 'text-center',
     },
     {
-        id: 'Horario',
+        id: 'HORARIO',
         label: 'Horario',
-        sourceKeys: ['From_Time_Planning', 'To_Time_Planning'],
-        render: row => formatSchedule(row.From_Time_Planning, row.To_Time_Planning),
+        sourceKeys: ['HORARIO'],
+        render: row => formatValue(row.HORARIO),
         cellClassName: 'whitespace-nowrap',
     },
     {
-        id: 'Planificacion_Diaria',
+        id: 'PLANNED',
         label: 'Planned',
-        sourceKeys: ['Planificacion_Diaria'],
-        render: row => row.Planificacion_Diaria || '--',
+        sourceKeys: ['PLANNED'],
+        render: row => formatValue(row.PLANNED),
         cellClassName: 'whitespace-nowrap',
     },
     {
-        id: 'Posicion_Agente',
+        id: 'POSICION AGENTE',
         label: 'Posicion Agente',
-        sourceKeys: ['Posicion_Agente'],
-        render: row => row.Posicion_Agente || '--',
+        sourceKeys: ['POSICION AGENTE'],
+        render: row => formatValue(row['POSICION AGENTE']),
     },
     {
-        id: 'Supervisor',
+        id: 'POSICION SUP',
         label: 'Posicion Sup',
-        sourceKeys: ['Supervisor'],
-        render: row => row.Supervisor || '--',
+        sourceKeys: ['POSICION SUP'],
+        render: row => formatValue(row['POSICION SUP']),
     },
     {
-        id: 'Hrs_WP',
+        id: 'WP_HOURS',
         label: 'WP Hours',
-        sourceKeys: ['Hrs_WP'],
-        render: row => formatNumericValue(row.Hrs_WP),
+        sourceKeys: ['WP_HOURS'],
+        render: row => formatValue(row.WP_HOURS),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Hrs_Ley',
+        id: 'LAW_HOURS',
         label: 'Law Hours',
-        sourceKeys: ['Hrs_Ley'],
-        render: row => formatNumericValue(row.Hrs_Ley),
+        sourceKeys: ['LAW_HOURS'],
+        render: row => formatValue(row.LAW_HOURS),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Calculated_Law_Hours',
+        id: 'CALCULATED_LAW_HOURS',
         label: 'Calculated Law Hours',
-        sourceKeys: ['Calculated_Law_Hours'],
-        render: row => formatNumericValue(row.Calculated_Law_Hours),
+        sourceKeys: ['CALCULATED_LAW_HOURS'],
+        render: row => formatValue(row.CALCULATED_LAW_HOURS),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Login',
+        id: 'LOGIN AMD',
         label: 'Login AMD',
-        sourceKeys: ['Login'],
-        render: row => formatTimeValue(row.Login),
+        sourceKeys: ['LOGIN AMD'],
+        render: row => formatValue(row['LOGIN AMD']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Logout',
+        id: 'LOGOUT AMD',
         label: 'Logout AMD',
-        sourceKeys: ['Logout'],
-        render: row => formatTimeValue(row.Logout),
+        sourceKeys: ['LOGOUT AMD'],
+        render: row => formatValue(row['LOGOUT AMD']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Login_wp',
+        id: 'LOGIN DMD',
         label: 'Login DMD',
-        sourceKeys: ['Login_wp'],
-        render: row => formatTimeValue(row.Login_wp),
+        sourceKeys: ['LOGIN DMD'],
+        render: row => formatValue(row['LOGIN DMD']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Logout_wp',
+        id: 'LOGOUT DMD',
         label: 'Logout DMD',
-        sourceKeys: ['Logout_wp'],
-        render: row => formatTimeValue(row.Logout_wp),
+        sourceKeys: ['LOGOUT DMD'],
+        render: row => formatValue(row['LOGOUT DMD']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Staffed_Time',
+        id: 'STAFFED TIME HORAS',
         label: 'Staffed Time Horas',
-        sourceKeys: ['Staffed_Time'],
-        render: row => formatNumericValue(row.Staffed_Time),
+        sourceKeys: ['STAFFED TIME HORAS'],
+        render: row => formatValue(row['STAFFED TIME HORAS']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Missing_Time',
+        id: 'MISSING TIME HORAS',
         label: 'Missing Time Horas',
-        sourceKeys: ['Missing_Time'],
-        render: row => formatNumericValue(row.Missing_Time),
+        sourceKeys: ['MISSING TIME HORAS'],
+        render: row => formatValue(row['MISSING TIME HORAS']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'WP_Total',
+        id: 'WP_TOTAL',
         label: 'WP Total',
-        sourceKeys: ['WP_Total'],
-        render: row => formatNumericValue(row.WP_Total),
+        sourceKeys: ['WP_TOTAL'],
+        render: row => formatValue(row.WP_TOTAL),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Vto',
+        id: 'VTO',
         label: 'VTO',
-        sourceKeys: ['Vto'],
-        render: row => formatNumericValue(row.Vto),
+        sourceKeys: ['VTO'],
+        render: row => formatValue(row.VTO),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Total',
+        id: 'TOTAL',
         label: 'Total',
-        sourceKeys: ['Total'],
-        render: row => formatNumericValue(row.Total),
+        sourceKeys: ['TOTAL'],
+        render: row => formatValue(row.TOTAL),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Asistencia',
+        id: 'ASISTENCIA',
         label: 'Asistencia',
-        sourceKeys: ['Asistencia'],
-        render: row => row.Asistencia || '--',
+        sourceKeys: ['ASISTENCIA'],
+        render: row => formatValue(row.ASISTENCIA),
         cellClassName: 'whitespace-nowrap',
     },
     {
-        id: 'WP',
+        id: 'PASE',
         label: 'Pase',
-        sourceKeys: ['WP'],
-        render: row => row.WP || '--',
+        sourceKeys: ['PASE'],
+        render: row => formatValue(row.PASE),
         cellClassName: 'whitespace-nowrap',
     },
     {
-        id: 'Final',
+        id: 'FINAL',
         label: 'Final',
-        sourceKeys: ['Final'],
-        render: row => row.Final || '--',
+        sourceKeys: ['FINAL'],
+        render: row => formatValue(row.FINAL),
         cellClassName: 'whitespace-nowrap',
     },
     {
-        id: 'Conexion_neta',
+        id: 'CONEXION_NETA',
         label: 'Conexión Neta',
-        sourceKeys: ['Conexion_neta'],
-        render: row => formatNumericValue(row.Conexion_neta),
+        sourceKeys: ['CONEXION_NETA'],
+        render: row => formatValue(row.CONEXION_NETA),
         cellClassName: 'font-mono whitespace-nowrap text-teal font-semibold',
     },
     {
-        id: 'Conexion_neta_calculada',
+        id: 'CONEXION_NETA_CALCULADA',
         label: 'Conexión Neta Calc',
-        sourceKeys: ['Conexion_neta_calculada'],
-        render: row => formatNumericValue(row.Conexion_neta_calculada),
+        sourceKeys: ['CONEXION_NETA_CALCULADA'],
+        render: row => formatValue(row.CONEXION_NETA_CALCULADA),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Conexion_AMD',
+        id: 'CONEXION_AMD',
         label: 'Conexión AMD',
-        sourceKeys: ['Conexion_AMD'],
-        render: row => formatNumericValue(row.Conexion_AMD),
+        sourceKeys: ['CONEXION_AMD'],
+        render: row => formatValue(row.CONEXION_AMD),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Conexion_DMD',
+        id: 'CONEXION_DMD',
         label: 'Conexión DMD',
-        sourceKeys: ['Conexion_DMD'],
-        render: row => formatNumericValue(row.Conexion_DMD),
+        sourceKeys: ['CONEXION_DMD'],
+        render: row => formatValue(row.CONEXION_DMD),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Diferencia',
+        id: 'DIFERENCIA',
         label: 'Diferencia',
-        sourceKeys: ['Diferencia'],
-        render: row => formatNumericValue(row.Diferencia),
+        sourceKeys: ['DIFERENCIA'],
+        render: row => formatValue(row.DIFERENCIA),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Horas_Extra',
+        id: 'HORAS_EXTRA_SEG',
         label: 'Horas Extra Seg',
-        sourceKeys: ['Horas_Extra'],
-        render: row => formatNumericValue(row.Horas_Extra),
+        sourceKeys: ['HORAS_EXTRA_SEG'],
+        render: row => formatValue(row.HORAS_EXTRA_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Horas_DDD',
+        id: 'HORAS DDD',
         label: 'Horas DDD',
-        sourceKeys: ['Horas_DDD'],
-        render: row => formatNumericValue(row.Horas_DDD),
+        sourceKeys: ['HORAS DDD'],
+        render: row => formatValue(row['HORAS DDD']),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'Horas_Jornada',
+        id: 'HORAS_JORNADA_SEG',
         label: 'Horas Jornada Seg',
-        sourceKeys: ['Horas_Jornada'],
-        render: row => formatNumericValue(row.Horas_Jornada),
+        sourceKeys: ['HORAS_JORNADA_SEG'],
+        render: row => formatValue(row.HORAS_JORNADA_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'horas_descuento',
+        id: 'HORAS_DESCUENTO_SEG',
         label: 'Horas Descuento Seg',
-        sourceKeys: ['horas_descuento'],
-        render: row => formatNumericValue(row.horas_descuento),
+        sourceKeys: ['HORAS_DESCUENTO_SEG'],
+        render: row => formatValue(row.HORAS_DESCUENTO_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
-        id: 'septimo_proporcional',
+        id: 'SEPTIMO_PROPORCIONAL',
         label: 'Septimo Proporcional',
-        sourceKeys: ['septimo_proporcional'],
-        render: row => formatNumericValue(row.septimo_proporcional),
+        sourceKeys: ['SEPTIMO_PROPORCIONAL'],
+        render: row => formatValue(row.SEPTIMO_PROPORCIONAL),
         cellClassName: 'font-mono whitespace-nowrap',
     },
 ]
@@ -439,7 +335,7 @@ export const ConexionNetaOpe = () => {
     const activeLoading = isGtUad ? loadingGT : loading
 
     const sortedRows = useMemo(() => {
-        return [...activeRows].sort(sortRowsByRosterAndDate)
+        return [...activeRows].sort(sortRowsByRoster)
     }, [activeRows])
 
     const visibleColumns = useMemo(() => {
@@ -452,48 +348,14 @@ export const ConexionNetaOpe = () => {
         )
     }, [sortedRows])
 
-    const weeklyCellRowSpanByIndex = useMemo(() => {
-        const rowSpanMap = new Map<number, number>()
-
-        for (let rowIndex = 0; rowIndex < sortedRows.length; rowIndex += 1) {
-            let rowSpan = 1
-
-            while (
-                shouldMergeWeeklyTotal(
-                    sortedRows[rowIndex + rowSpan - 1],
-                    sortedRows[rowIndex + rowSpan],
-                )
-            ) {
-                rowSpan += 1
-            }
-
-            rowSpanMap.set(rowIndex, rowSpan)
-            rowIndex += rowSpan - 1
-        }
-
-        return rowSpanMap
-    }, [sortedRows])
-
     const summary = useMemo(() => {
-        const uniqueRosters = new Set(sortedRows.map(row => row.Codigo_Agente)).size
-        const totalConexionNeta = sortedRows.reduce(
-            (total, row) => total + parseNumericValue(row.Conexion_neta),
-            0,
-        )
-
-        const totalWeeklyHours = Array.from(weeklyCellRowSpanByIndex.keys()).reduce(
-            (total, rowIndex) =>
-                total + parseNumericValue(sortedRows[rowIndex]?.Conexion_Neta_Semana),
-            0,
-        )
+        const uniqueRosters = new Set(sortedRows.map(row => row.ROSTER)).size
 
         return {
             totalRows: sortedRows.length,
             uniqueRosters,
-            totalConexionNeta,
-            totalWeeklyHours,
         }
-    }, [sortedRows, weeklyCellRowSpanByIndex])
+    }, [sortedRows])
 
     useEffect(() => {
         const container = tableScrollRef.current
@@ -523,8 +385,6 @@ export const ConexionNetaOpe = () => {
             window.cancelAnimationFrame(frameId)
         }
     }, [syncScrollControls, visibleColumns.length, sortedRows.length])
-
-    const totalColumnCount = visibleColumns.length + 1
 
     return (
         <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
@@ -592,9 +452,6 @@ export const ConexionNetaOpe = () => {
                                         {column.label}
                                     </th>
                                 ))}
-                                <th className='px-6 py-4 text-xs font-semibold text-teal uppercase tracking-[0.18em] whitespace-nowrap text-center border-l border-primary-border'>
-                                    Conexión Neta Semanal
-                                </th>
                             </tr>
                         </thead>
 
@@ -602,7 +459,7 @@ export const ConexionNetaOpe = () => {
                             {activeLoading && (
                                 <tr>
                                     <td
-                                        colSpan={totalColumnCount}
+                                        colSpan={visibleColumns.length}
                                         className='px-6 py-16 text-center text-sm text-slate-500'
                                     >
                                         Cargando datos de conexión neta...
@@ -613,7 +470,7 @@ export const ConexionNetaOpe = () => {
                             {!activeLoading && error && (
                                 <tr>
                                     <td
-                                        colSpan={totalColumnCount}
+                                        colSpan={visibleColumns.length}
                                         className='px-6 py-16 text-center text-sm text-orange'
                                     >
                                         {error}
@@ -624,7 +481,7 @@ export const ConexionNetaOpe = () => {
                             {!activeLoading && !error && sortedRows.length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={totalColumnCount}
+                                        colSpan={visibleColumns.length}
                                         className='px-6 py-16 text-center text-sm text-slate-500'
                                     >
                                         {selectedUad === null
@@ -638,8 +495,8 @@ export const ConexionNetaOpe = () => {
                                 !error &&
                                 sortedRows.map((row, rowIndex) => (
                                     <tr
-                                        key={`${row.Codigo_Agente}-${row.Fecha}-${rowIndex}`}
-                                        className='transition-colors hover:codg-background-light/60'
+                                        key={`${row.ROSTER}-${row.FECHA}-${rowIndex}`}
+                                        className='transition-colors hover:bg-background-light/60'
                                     >
                                         {visibleColumns.map(column => (
                                             <td
@@ -651,24 +508,6 @@ export const ConexionNetaOpe = () => {
                                                 {column.render(row)}
                                             </td>
                                         ))}
-
-                                        {weeklyCellRowSpanByIndex.has(rowIndex) && (
-                                            <td
-                                                rowSpan={weeklyCellRowSpanByIndex.get(rowIndex)}
-                                                className='min-w-[220px] border-l border-primary-border bg-background-light align-middle'
-                                            >
-                                                <div className='flex min-h-[180px] flex-col items-center justify-center px-6 py-10 text-center'>
-                                                    <span className='text-4xl font-bold text-teal font-display'>
-                                                        {formatNumericValue(
-                                                            row.Conexion_Neta_Semana,
-                                                        )}
-                                                    </span>
-                                                    <span className='mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange'>
-                                                        Total Horas
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        )}
                                     </tr>
                                 ))}
                         </tbody>
@@ -683,47 +522,18 @@ export const ConexionNetaOpe = () => {
                         <span className='font-semibold text-charcoal'>{summary.uniqueRosters}</span>{' '}
                         rosters
                     </p>
-                    <div className='flex flex-col gap-1 text-sm text-slate-600 sm:flex-row sm:items-center sm:gap-6'>
-                        <span>
-                            Conexión Neta total:{' '}
-                            <strong className='text-teal'>
-                                {formatNumericValue(summary.totalConexionNeta)}
-                            </strong>
-                        </span>
-                        <span>
-                            Total semanal acumulado:{' '}
-                            <strong className='text-orange'>
-                                {formatNumericValue(summary.totalWeeklyHours)}
-                            </strong>
-                        </span>
-                    </div>
                 </div>
             </div>
 
-            <div className='mt-8 grid grid-cols-1 md:grid-cols-3 gap-6'>
+            <div className='mt-8 grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='rounded-2xl border border-cyan bg-background-light p-6 shadow-sm'>
                     <div className='flex items-center gap-3 mb-3'>
                         <span className='material-symbols-outlined text-cyan'>dashboard</span>
-                        <h3 className='font-semibold text-charcoal'>Resumen Semanal</h3>
+                        <h3 className='font-semibold text-charcoal'>Columnas Dinámicas</h3>
                     </div>
                     <p className='text-sm text-slate-600 leading-relaxed'>
-                        Las celdas de la última columna se agrupan por roster para mostrar una sola
-                        vez el total de conexión neta semanal cuando el valor es el mismo.
-                    </p>
-                </div>
-
-                <div className='rounded-2xl border border-primary-border bg-white p-6 shadow-sm'>
-                    <div className='flex items-center justify-between mb-4'>
-                        <h3 className='font-semibold text-charcoal'>Horas Semanales</h3>
-                        <span className='text-xs font-semibold uppercase tracking-[0.18em] text-orange'>
-                            Acumulado
-                        </span>
-                    </div>
-                    <span className='block text-4xl font-bold text-teal font-display'>
-                        {formatNumericValue(summary.totalWeeklyHours)}
-                    </span>
-                    <p className='mt-2 text-sm text-slate-500'>
-                        Suma de los totales únicos de conexión neta semanal por roster.
+                        Las columnas se muestran únicamente cuando el endpoint retorna datos para
+                        ellas. Las columnas vacías se ocultan automáticamente.
                     </p>
                 </div>
 
@@ -736,11 +546,11 @@ export const ConexionNetaOpe = () => {
                         </p>
                         <p>
                             <span className='font-semibold text-charcoal'>Desde:</span>{' '}
-                            {formatDateValue(dateRange[0])}
+                            {dateRange[0] || '--'}
                         </p>
                         <p>
                             <span className='font-semibold text-charcoal'>Hasta:</span>{' '}
-                            {formatDateValue(dateRange[1])}
+                            {dateRange[1] || '--'}
                         </p>
                     </div>
                 </div>

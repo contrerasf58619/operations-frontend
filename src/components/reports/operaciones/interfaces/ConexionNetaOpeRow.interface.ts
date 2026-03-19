@@ -3,43 +3,9 @@
  * Fields marked optional appear in the CSV display model but are not yet
  * returned by the current backend — they will just be undefined until added.
  *
- * CSV column → field mapping:
- *   ROSTER                → Codigo_Agente
- *   NOMBRE                → Nombre_Agente
- *   FECHA                 → Fecha
- *   NOMENCLATURA          → Asistencia_Planificacion
- *   HORARIO               → From_Time_Planning / To_Time_Planning
- *   PLANNED               → Planificacion_Diaria
- *   POSICION AGENTE       → Posicion_Agente  (optional)
- *   POSICION SUP          → Supervisor       (optional)
- *   WP_HOURS              → Hrs_WP
- *   LAW_HOURS             → Hrs_Ley
- *   CALCULATED_LAW_HOURS  → Calculated_Law_Hours (optional)
- *   LOGIN AMD             → Login
- *   LOGOUT AMD            → Logout
- *   LOGIN DMD             → Login_wp
- *   LOGOUT DMD            → Logout_wp
- *   STAFFED TIME HORAS    → Staffed_Time
- *   MISSING TIME HORAS    → Missing_Time
- *   WP_TOTAL              → WP_Total
- *   VTO                   → Vto
- *   TOTAL                 → Total            (optional)
- *   ASISTENCIA            → Asistencia
- *   PASE                  → WP
- *   FINAL                 → Final
- *   CONEXION_NETA         → Conexion_neta
- *   CONEXION_NETA_CALC    → Conexion_neta_calculada (optional)
- *   CONEXION_AMD          → Conexion_AMD     (optional)
- *   CONEXION_DMD          → Conexion_DMD     (optional)
- *   DIFERENCIA            → Diferencia       (optional)
- *   HORAS_EXTRA_SEG       → Horas_Extra      (optional)
- *   HORAS DDD             → Horas_DDD        (optional)
- *   HORAS_JORNADA_SEG     → Horas_Jornada    (optional)
- *   HORAS_DESCUENTO_SEG   → horas_descuento
- *   SEPTIMO_PROPORCIONAL  → septimo_proporcional
- *   (appended by backend) → Conexion_Neta_Semana
- *   (appended by backend) → Conexion_Neta_Proporcional
  */
+
+// This is the old interface that matches the backend response, it is used in the backend response parsing and then transformed into the Datum interface for the frontend display
 export interface ConexionNetaOpeRow {
     // ── identity ──────────────────────────────────────────────────
     Codigo_Agente: number
@@ -85,4 +51,61 @@ export interface ConexionNetaOpeRow {
     // ── weekly totals (always appended by backend) ────────────────
     Conexion_Neta_Semana: string
     Conexion_Neta_Proporcional: string
+}
+
+// this is the new interface from the data table that should be used in the frontend, it is based on the backend response but with more user friendly field names
+export interface ConexionNetaOpeDatum {
+    ROSTER: number
+    NOMBRE: string
+    FECHA: string
+    NOMENCLATURA: Asistencia
+    HORARIO: string
+    PLANNED: string
+    'POSICION AGENTE': string
+    'POSICION SUP': string
+    WP_HOURS: string
+    LAW_HOURS: string
+    CALCULATED_LAW_HOURS: string
+    'LOGIN AMD': string
+    'LOGOUT AMD': string
+    'LOGIN DMD': string
+    'LOGOUT DMD': string
+    'STAFFED TIME HORAS': string
+    'MISSING TIME HORAS': string
+    WP_TOTAL: string
+    VTO: string
+    TOTAL: string
+    ASISTENCIA: Asistencia
+    PASE: string
+    FINAL: Asistencia
+    CONEXION_NETA: string
+    CONEXION_NETA_CALCULADA: string
+    CONEXION_AMD: string
+    CONEXION_DMD: string
+    DIFERENCIA: string
+    HORAS_EXTRA_SEG: string
+    'HORAS DDD': string
+    HORAS_JORNADA_SEG: string
+    HORAS_DESCUENTO_SEG: string
+    SEPTIMO_PROPORCIONAL: string
+}
+
+export enum Asistencia {
+    Baja = 'baja',
+    Ddd = 'ddd',
+    Fcj = 'fcj',
+    Fcjsg = 'fcjsg',
+    Fsj = 'fsj',
+    ISR = 'isr',
+    Icr = 'icr',
+    Inc = 'inc',
+    Inccj = 'inccj',
+    Ios = 'ios',
+    Late = 'late',
+    Psg = 'psg',
+    SUS = 'sus',
+    Sig = 'sig',
+    Vac = 'vac',
+    X = 'x',
+    Xos = 'xos',
 }
