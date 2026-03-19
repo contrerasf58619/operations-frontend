@@ -11,6 +11,8 @@ import { GT_UAD_IDS } from '@/constants/uads'
 import { useEffect, useMemo, useState } from 'react'
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
 import { COLUMN_DEFINITIONS } from './utils/columns-cno'
+import { TableSkeleton } from './TableSkeleton'
+import { MdSearch, MdClose } from 'react-icons/md'
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
 
@@ -43,6 +45,7 @@ export const ConexionNetaOpe = () => {
         useConexionNetaOpe()
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(20)
+    const [searchQuery, setSearchQuery] = useState('')
     const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
 
     useEffect(() => {
@@ -71,17 +74,27 @@ export const ConexionNetaOpe = () => {
         return [...activeRows].sort(sortRowsByRoster)
     }, [activeRows])
 
-    const totalPages = Math.max(1, Math.ceil(sortedRows.length / rowsPerPage))
+    const filteredRows = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase()
+        if (!q) return sortedRows
+        return sortedRows.filter(
+            row =>
+                String(row.ROSTER).toLowerCase().includes(q) ||
+                row.NOMBRE.toLowerCase().includes(q),
+        )
+    }, [sortedRows, searchQuery])
 
-    // Reset to page 1 whenever dataset or page size changes
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage))
+
+    // Reset to page 1 whenever dataset, filter, or page size changes
     useEffect(() => {
         setCurrentPage(1)
-    }, [sortedRows, rowsPerPage])
+    }, [filteredRows, rowsPerPage])
 
     const pagedRows = useMemo(() => {
         const start = (currentPage - 1) * rowsPerPage
-        return sortedRows.slice(start, start + rowsPerPage)
-    }, [sortedRows, currentPage, rowsPerPage])
+        return filteredRows.slice(start, start + rowsPerPage)
+    }, [filteredRows, currentPage, rowsPerPage])
 
     const visibleColumns = useMemo(() => {
         if (sortedRows.length === 0) {
@@ -94,17 +107,17 @@ export const ConexionNetaOpe = () => {
     }, [sortedRows])
 
     const summary = useMemo(() => {
-        const uniqueRosters = new Set(sortedRows.map(row => row.ROSTER)).size
+        const uniqueRosters = new Set(filteredRows.map(row => row.ROSTER)).size
         const pageStart = (currentPage - 1) * rowsPerPage + 1
-        const pageEnd = Math.min(currentPage * rowsPerPage, sortedRows.length)
+        const pageEnd = Math.min(currentPage * rowsPerPage, filteredRows.length)
 
         return {
-            totalRows: sortedRows.length,
+            totalRows: filteredRows.length,
             uniqueRosters,
-            pageStart: sortedRows.length === 0 ? 0 : pageStart,
+            pageStart: filteredRows.length === 0 ? 0 : pageStart,
             pageEnd,
         }
-    }, [sortedRows, currentPage])
+    }, [filteredRows, currentPage, rowsPerPage])
 
     return (
         <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
@@ -123,6 +136,40 @@ export const ConexionNetaOpe = () => {
                     </div>
                 </div>
             </div>
+
+            <div className='flex items-center gap-2 mb-4'>
+                    <div className='relative flex-1 max-w-sm'>
+                        <MdSearch
+                            size={18}
+                            className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                        />
+                        <input
+                            type='text'
+                            placeholder='Buscar por roster o nombre...'
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className='w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan focus:border-cyan transition-colors'
+                        />
+                        {searchQuery && (
+                            <button
+                                type='button'
+                                onClick={() => setSearchQuery('')}
+                                className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
+                                aria-label='Limpiar búsqueda'
+                            >
+                                <MdClose size={16} />
+                            </button>
+                        )}
+                    </div>
+                    {searchQuery && (
+                        <p className='text-sm text-slate-500 whitespace-nowrap'>
+                            <span className='font-semibold text-charcoal'>{filteredRows.length}</span>
+                            {' de '}
+                            <span className='font-semibold text-charcoal'>{sortedRows.length}</span>
+                            {' resultados'}
+                        </p>
+                    )}
+                </div>
 
             <div className='bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
                 <div className='overflow-x-auto'>
@@ -144,14 +191,7 @@ export const ConexionNetaOpe = () => {
 
                         <tbody className='divide-y divide-slate-200'>
                             {activeLoading && (
-                                <tr>
-                                    <td
-                                        colSpan={visibleColumns.length}
-                                        className='px-6 py-16 text-center text-sm text-slate-500'
-                                    >
-                                        Cargando datos de conexión neta...
-                                    </td>
-                                </tr>
+                                <TableSkeleton columns={visibleColumns.length} />
                             )}
 
                             {!activeLoading && error && (
@@ -165,7 +205,7 @@ export const ConexionNetaOpe = () => {
                                 </tr>
                             )}
 
-                            {!activeLoading && !error && sortedRows.length === 0 && (
+                            {!activeLoading && !error && filteredRows.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={visibleColumns.length}
@@ -173,7 +213,9 @@ export const ConexionNetaOpe = () => {
                                     >
                                         {selectedUad === null
                                             ? 'Selecciona un UAD para consultar los datos.'
-                                            : 'No se encontraron registros para los filtros seleccionados.'}
+                                            : searchQuery
+                                              ? `Sin resultados para "${searchQuery}".`
+                                              : 'No se encontraron registros para los filtros seleccionados.'}
                                     </td>
                                 </tr>
                             )}

@@ -1,0 +1,26 @@
+const SKELETON_ROW_COUNT = 8
+
+function SkeletonCell({ index }: { index: number }) {
+    // Vary widths to make it look more natural
+    const widths = ['w-12', 'w-40', 'w-20', 'w-16', 'w-24', 'w-16', 'w-20']
+    const width = widths[index % widths.length]
+    return (
+        <td className='px-6 py-4'>
+            <div className={`h-3.5 rounded-full ${width} bg-slate-200 animate-pulse`} />
+        </td>
+    )
+}
+
+export function TableSkeleton({ columns }: { columns: number }) {
+    return (
+        <>
+            {Array.from({ length: SKELETON_ROW_COUNT }).map((_, rowIndex) => (
+                <tr key={rowIndex} className='border-b border-slate-100'>
+                    {Array.from({ length: columns }).map((_, colIndex) => (
+                        <SkeletonCell key={colIndex} index={colIndex} />
+                    ))}
+                </tr>
+            ))}
+        </>
+    )
+}
