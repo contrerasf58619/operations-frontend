@@ -5,7 +5,6 @@
  *
  */
 
-// This is the old interface that matches the backend response, it is used in the backend response parsing and then transformed into the Datum interface for the frontend display
 export interface ConexionNetaOpeRow {
     // ── identity ──────────────────────────────────────────────────
     Codigo_Agente: number
@@ -53,7 +52,6 @@ export interface ConexionNetaOpeRow {
     Conexion_Neta_Proporcional: string
 }
 
-// this is the new interface from the data table that should be used in the frontend, it is based on the backend response but with more user friendly field names
 export interface ConexionNetaOpeDatum {
     ROSTER: number
     NOMBRE: string
