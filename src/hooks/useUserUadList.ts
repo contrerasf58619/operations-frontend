@@ -8,6 +8,17 @@ type UadOption = {
     name: string
 }
 
+type RawUadOption = {
+    value?: number | string
+    id?: number | string
+    uadId?: number | string
+    uad_id?: number | string
+    name?: string
+    label?: string
+    uadName?: string
+    description?: string
+}
+
 function dedupeUadOptions(options: UadOption[]): UadOption[] {
     const seenValues = new Set<number>()
 
@@ -21,7 +32,7 @@ function dedupeUadOptions(options: UadOption[]): UadOption[] {
     })
 }
 
-function normalizeUadOption(option: any): UadOption | null {
+function normalizeUadOption(option: RawUadOption | null | undefined): UadOption | null {
     const value = Number(option?.value ?? option?.id ?? option?.uadId ?? option?.uad_id)
     const name = option?.name ?? option?.label ?? option?.uadName ?? option?.description
 

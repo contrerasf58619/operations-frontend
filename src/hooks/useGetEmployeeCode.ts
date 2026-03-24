@@ -18,32 +18,53 @@ export const useGetEmployeeCode = () => {
     const [employeeCode, setEmployeeCode] = useState<number>()
 
     useEffect(() => {
+        let intervalId: number | null = null
+        let attempts = 0
+        const MAX_ATTEMPTS = 60
+
         const syncEmployeeCode = () => {
-            const nextEmployeeCode = readEmployeeCode()
+            try {
+                const nextEmployeeCode = readEmployeeCode()
 
-            if (nextEmployeeCode === undefined) {
-                return false
+                if (nextEmployeeCode === undefined) {
+                    attempts += 1
+
+                    if (attempts >= MAX_ATTEMPTS && intervalId !== null) {
+                        window.clearInterval(intervalId)
+                    }
+
+                    return false
+                }
+
+                setEmployeeCode(nextEmployeeCode)
+                return true
+            } catch (error) {
+                console.error('Error reading employeeCode cookie:', error)
+
+                if (intervalId !== null) {
+                    window.clearInterval(intervalId)
+                }
+
+                return true
             }
-
-            setEmployeeCode(nextEmployeeCode)
-            return true
         }
 
         if (syncEmployeeCode()) {
             return
         }
 
-        const interval = window.setInterval(() => {
-            if (syncEmployeeCode()) {
-                window.clearInterval(interval)
+        intervalId = window.setInterval(() => {
+            if (syncEmployeeCode() && intervalId !== null) {
+                window.clearInterval(intervalId)
             }
         }, 500)
 
-        return () => window.clearInterval(interval)
+        return () => {
+            if (intervalId !== null) {
+                window.clearInterval(intervalId)
+            }
+        }
     }, [])
 
-    return {
-        setEmployeeCode,
-        employeeCode,
-    }
+    return { setEmployeeCode, employeeCode }
 }
