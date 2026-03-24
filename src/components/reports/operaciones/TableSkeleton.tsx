@@ -1,7 +1,6 @@
 const SKELETON_ROW_COUNT = 8
 
 function SkeletonCell({ index }: { index: number }) {
-    // Vary widths to make it look more natural
     const widths = ['w-12', 'w-40', 'w-20', 'w-16', 'w-24', 'w-16', 'w-20']
     const width = widths[index % widths.length]
     return (

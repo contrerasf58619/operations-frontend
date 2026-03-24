@@ -22,6 +22,7 @@ const GROUPED_COLUMN_IDS = new Set<keyof ConexionNetaOpeDatum>([
     'WP_HOURS',
     'LAW_HOURS',
     'CALCULATED_LAW_HOURS',
+    'HORAS_EXTRA_SEG',
 ])
 
 type CellMeta = { render: boolean; rowspan: number }
@@ -113,7 +114,7 @@ export const ConexionNetaOpe = () => {
 
     const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage))
 
-    // Reset to page 1 whenever dataset, filter, or page size changes
+    // Reset to page 1
     useEffect(() => {
         setCurrentPage(1)
     }, [filteredRows, rowsPerPage])
@@ -173,38 +174,38 @@ export const ConexionNetaOpe = () => {
             </div>
 
             <div className='flex items-center gap-2 mb-4'>
-                    <div className='relative flex-1 max-w-sm'>
-                        <MdSearch
-                            size={18}
-                            className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
-                        />
-                        <input
-                            type='text'
-                            placeholder='Buscar por roster o nombre...'
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            className='w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan focus:border-cyan transition-colors'
-                        />
-                        {searchQuery && (
-                            <button
-                                type='button'
-                                onClick={() => setSearchQuery('')}
-                                className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
-                                aria-label='Limpiar búsqueda'
-                            >
-                                <MdClose size={16} />
-                            </button>
-                        )}
-                    </div>
+                <div className='relative flex-1 max-w-sm'>
+                    <MdSearch
+                        size={18}
+                        className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                    />
+                    <input
+                        type='text'
+                        placeholder='Buscar por roster o nombre...'
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        className='w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan focus:border-cyan transition-colors'
+                    />
                     {searchQuery && (
-                        <p className='text-sm text-slate-500 whitespace-nowrap'>
-                            <span className='font-semibold text-charcoal'>{filteredRows.length}</span>
-                            {' de '}
-                            <span className='font-semibold text-charcoal'>{sortedRows.length}</span>
-                            {' resultados'}
-                        </p>
+                        <button
+                            type='button'
+                            onClick={() => setSearchQuery('')}
+                            className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
+                            aria-label='Limpiar búsqueda'
+                        >
+                            <MdClose size={16} />
+                        </button>
                     )}
                 </div>
+                {searchQuery && (
+                    <p className='text-sm text-slate-500 whitespace-nowrap'>
+                        <span className='font-semibold text-charcoal'>{filteredRows.length}</span>
+                        {' de '}
+                        <span className='font-semibold text-charcoal'>{sortedRows.length}</span>
+                        {' resultados'}
+                    </p>
+                )}
+            </div>
 
             <div className='bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
                 <div className='overflow-x-auto'>
@@ -225,9 +226,7 @@ export const ConexionNetaOpe = () => {
                         </thead>
 
                         <tbody className='divide-y divide-slate-200'>
-                            {activeLoading && (
-                                <TableSkeleton columns={visibleColumns.length} />
-                            )}
+                            {activeLoading && <TableSkeleton columns={visibleColumns.length} />}
 
                             {!activeLoading && error && (
                                 <tr>
@@ -263,12 +262,10 @@ export const ConexionNetaOpe = () => {
                                         className='transition-colors hover:bg-background-light/60'
                                     >
                                         {visibleColumns.map(column => {
-                                            const colId =
-                                                column.id as keyof ConexionNetaOpeDatum
+                                            const colId = column.id as keyof ConexionNetaOpeDatum
 
                                             if (GROUPED_COLUMN_IDS.has(colId)) {
-                                                const meta =
-                                                    groupMeta.get(colId)?.[rowIndex]
+                                                const meta = groupMeta.get(colId)?.[rowIndex]
 
                                                 if (!meta?.render) return null
 
@@ -380,7 +377,6 @@ export const ConexionNetaOpe = () => {
             <div className='mt-8 grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='rounded-2xl border border-cyan bg-background-light p-6 shadow-sm'>
                     <div className='flex items-center gap-3 mb-3'>
-                        {/* <span className='material-symbols-outlined text-cyan'>dashboard</span> */}
                         <h3 className='font-semibold text-charcoal'>Columnas Dinámicas</h3>
                     </div>
                     <p className='text-sm text-slate-600 leading-relaxed'>
