@@ -1,5 +1,7 @@
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { SidebarProvider } from '@/context/sidebar/SideBarContex'
+import { UadProvider } from '@/context/uad/UadContext'
+import { DateProvider } from '@/context/UI/DateContext'
 import { LoadingProvider } from '@/context/UI/LoadingContext'
 import { Metadata } from 'next'
 
@@ -12,7 +14,11 @@ export default function ATSLayout({ children }: { children: React.ReactNode }) {
     return (
         <LoadingProvider>
             <SidebarProvider>
-                <DefaultLayout>{children}</DefaultLayout>
+                <UadProvider>
+                    <DateProvider>
+                        <DefaultLayout>{children}</DefaultLayout>
+                    </DateProvider>
+                </UadProvider>
             </SidebarProvider>
         </LoadingProvider>
     )

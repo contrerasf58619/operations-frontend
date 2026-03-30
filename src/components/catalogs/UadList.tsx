@@ -1,34 +1,61 @@
-import { useEffect } from "react"
-import { useUserUadList } from "@/hooks/useUserUadList"
+'use client'
 
-interface UadOption {
-    value: string
-    name: string
-}
+import { ChangeEvent, useEffect } from 'react'
+import { useUserUadList } from '@/hooks/useUserUadList'
+import { useUadContext } from '@/context/uad/UadContext'
 
 interface UadListProps {
-    value?: string
+    value?: string | number
     onChange?: (value: string) => void
 }
 
-export function UadList({ value = "", onChange }: UadListProps) {
-    const { options } = useUserUadList()
+export function UadList({ value, onChange }: UadListProps) {
+    const { options, loading } = useUserUadList()
+    const { selectedUad, setSelectedUad } = useUadContext()
+
+    const currentValue =
+        value !== undefined && value !== null
+            ? String(value)
+            : selectedUad !== null && selectedUad !== undefined
+              ? String(selectedUad)
+              : ''
 
     useEffect(() => {
-        if ((value === "" || value === undefined) && options.length > 0) {
-            onChange && onChange(options[0].value)
+        if (options.length === 0) {
+            return
         }
-    }, [options, value, onChange])
+
+        const hasValidSelectedUad = options.some(option => String(option.value) === currentValue)
+
+        if (!hasValidSelectedUad) {
+            const defaultValue = String(options[0].value)
+            setSelectedUad(options[0].value)
+            onChange?.(defaultValue)
+        }
+    }, [options, currentValue, setSelectedUad, onChange])
+
+    const selectedValue = options.some(option => String(option.value) === currentValue)
+        ? currentValue
+        : String(options[0]?.value ?? '')
+
+    const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        const nextValue = event.target.value
+        setSelectedUad(Number(nextValue))
+        onChange?.(nextValue)
+    }
 
     return (
         <select
-            name="uad"
-            id="uad"
-            value={value}
-            onChange={(e) => onChange && onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            name='uad'
+            id='uad'
+            value={selectedValue}
+            onChange={handleChange}
+            disabled={options.length === 0}
+            className='w-full p-2 border rounded disabled:bg-gray-100 disabled:text-gray-500'
         >
-            {options.map((option: UadOption) => (
+            {loading && options.length === 0 && <option value=''>Loading UADs...</option>}
+            {!loading && options.length === 0 && <option value=''>No UADs available</option>}
+            {options.map(option => (
                 <option key={option.value} value={option.value}>
                     {option.name}
                 </option>
