@@ -1,0 +1,71 @@
+name: Operations — Push to ECR and Deploy QA
+
+on:
+    push:
+        branches:
+            - qa
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            # Step 1: Checkout code
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            # Step 2: Configure AWS credentials
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            # Step 3: Check if ECR repository exists, if not create it
+            - name: Check and create ECR repository if it doesn't exist
+              run: |
+                  REPO_NAME="operations-web-qa"
+                  REPO_EXISTS=$(aws ecr describe-repositories --repository-names $REPO_NAME --query 'repositories[].repositoryName' --output text 2>/dev/null || true)
+
+                  if [ -z "$REPO_EXISTS" ]; then
+                      echo "Repository does not exist, creating..."
+                      aws ecr create-repository --repository-name $REPO_NAME
+                      echo "Repository created."
+                  else
+                      echo "Repository already exists."
+                  fi
+
+            # Step 4: Log in to Amazon ECR
+            - name: Log in to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
+
+            # Step 5: Build, tag, and push image to Amazon ECR
+            - name: Build, tag, and push image to Amazon ECR
+              env:
+                  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+                  ECR_REPOSITORY: operations-web-qa
+                  IMAGE_TAG: latest
+              run: |
+                  docker build -f Dockerfile-qa -t $ECR_REPOSITORY:$IMAGE_TAG .
+                  docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                  docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+            # Step 6: Render the ECS task definition
+            - name: Render Amazon ECS task definition
+              id: render-task-definition
+              uses: aws-actions/amazon-ecs-render-task-definition@v1
+              with:
+                  task-definition: ecs-task-definition-qa.json
+                  container-name: operations-web-qa
+                  image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/operations-web-qa:latest
+
+            # Step 7: Deploy to ECS
+            - name: Deploy Amazon ECS task definition
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+              with:
+                  cluster: fargate-cluster-ats
+                  service: operations-web-qa
+                  task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
+                  wait-for-service-stability: true
