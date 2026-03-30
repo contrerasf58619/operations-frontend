@@ -34,9 +34,14 @@
         }
     ],
     "family": "operations-web-qa",
+    "taskRoleArn": "arn:aws:iam::290819635700:role/AWSECSTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::290819635700:role/AWSECSTaskExecutionRole",
     "networkMode": "awsvpc",
     "requiresCompatibilities": ["FARGATE"],
     "cpu": "512",
     "memory": "1024",
-    "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole"
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    }
 }
