@@ -91,19 +91,28 @@ const TakeAttendance: React.FC = () => {
                 >
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
                         <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-                            <label className='block text-sm font-semibold text-gray-900 mb-4'>
+                            <label
+                                htmlFor='uad'
+                                className='block text-sm font-semibold text-gray-900 mb-4'
+                            >
                                 UAD
                             </label>
-                            <div className='space-y-4'>
+
+                            <div className='space-y-4 mt-2'>
                                 <UadList value={selectedUad} onChange={v => setSelectedUad(v)} />
                             </div>
                         </div>
 
-                        <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-                            <label className='block text-sm font-semibold text-gray-900 mb-4'>
-                                Periodo de nómina
-                            </label>
+                        <label
+                            htmlFor='payroll'
+                            className='block text-sm font-semibold text-gray-900 mb-4'
+                        >
+                            Periodo de nómina
+                        </label>
+
+                        <div className='mt-2'>
                             <PayrollPeriodSelector
+                                // id='payroll'
                                 payrollPeriods={payrollPeriods}
                                 selectedPayrollPeriod={selectedPayrollPeriod}
                                 onChange={period => {
@@ -117,11 +126,16 @@ const TakeAttendance: React.FC = () => {
                         </div>
 
                         <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-                            <label className='block text-sm font-semibold text-gray-900 mb-4'>
+                            <label
+                                htmlFor='leader'
+                                className='block text-sm font-semibold text-gray-900 mb-4'
+                            >
                                 Seleccionar líder
                             </label>
+
                             <div className='space-y-2'>
                                 <Autocomplete
+                                    // id='leader'
                                     value={selectedLeader}
                                     onChange={val => {
                                         setSelectedLeader(val as string)
@@ -137,16 +151,6 @@ const TakeAttendance: React.FC = () => {
                                     }
                                     noOptionsText='No se encontraron líderes'
                                 />
-                                {loadingLeaders && (
-                                    <div className='text-xs text-gray-500 mt-1'>
-                                        Cargando líderes...
-                                    </div>
-                                )}
-                                {!loadingLeaders && leaders.length === 0 && selectedUad && (
-                                    <div className='text-xs text-gray-500 mt-1'>
-                                        No se encontraron líderes
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>

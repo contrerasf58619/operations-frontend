@@ -138,20 +138,22 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
                 <ul className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
                     {filteredOptions.length > 0 ? (
                         filteredOptions.map(option => (
-                            <li
-                                key={option.value}
-                                onClick={() => {
-                                    onChange(option.value)
-                                    setInputValue(option.label)
-                                    setIsOpen(false)
-                                }}
-                                className={`px-3 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                                    option.value === value
-                                        ? 'bg-blue-100 font-medium text-blue-900'
-                                        : 'text-gray-700'
-                                }`}
-                            >
-                                {option.label}
+                            <li key={option.value}>
+                                <button
+                                    type='button'
+                                    onClick={() => {
+                                        onChange(option.value)
+                                        setInputValue(option.label)
+                                        setIsOpen(false)
+                                    }}
+                                    className={`w-full text-left px-3 py-2 hover:bg-blue-50 transition-colors ${
+                                        option.value === value
+                                            ? 'bg-blue-100 font-medium text-blue-900'
+                                            : 'text-gray-700'
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
                             </li>
                         ))
                     ) : (

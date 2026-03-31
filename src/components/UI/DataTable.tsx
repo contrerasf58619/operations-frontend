@@ -67,10 +67,11 @@ export function DataTable<T>({
                                         className='px-4 py-3 text-left text-sm font-semibold text-gray-700'
                                     >
                                         {header.isPlaceholder ? null : (
-                                            <div
+                                            <button
+                                                type='button'
                                                 className={
                                                     header.column.getCanSort()
-                                                        ? 'cursor-pointer select-none flex items-center gap-2'
+                                                        ? 'cursor-pointer select-none flex items-center gap-2 bg-transparent'
                                                         : ''
                                                 }
                                                 onClick={header.column.getToggleSortingHandler()}
@@ -88,7 +89,7 @@ export function DataTable<T>({
                                                             '⬍'}
                                                     </span>
                                                 )}
-                                            </div>
+                                            </button>
                                         )}
                                     </th>
                                 ))}

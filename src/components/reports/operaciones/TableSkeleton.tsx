@@ -13,9 +13,9 @@ function SkeletonCell({ index }: { index: number }) {
 export function TableSkeleton({ columns }: { columns: number }) {
     return (
         <>
-            {Array.from({ length: skeletonRowsCount }).map((__, rowIndex) => (
+            {Array.from({ length: skeletonRowsCount }).map((item, rowIndex) => (
                 <tr key={rowIndex} className='border-b border-slate-100'>
-                    {Array.from({ length: columns }).map((__, colIndex) => (
+                    {Array.from({ length: columns }).map((item, colIndex) => (
                         <SkeletonCell key={colIndex} index={colIndex} />
                     ))}
                 </tr>
