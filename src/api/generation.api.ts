@@ -21,6 +21,7 @@ export const generationApi = {
 
     updateGenerations(payload: any, id: number) {
         const route = baseURL(api, `generation/${id}`)
+        return axios.put(route, payload, { headers: getHeaders() })
     },
 
     generationNumberByPayrollGroup(payload = {}) {
