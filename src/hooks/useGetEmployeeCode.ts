@@ -11,11 +11,13 @@ function readEmployeeCode() {
 
     const parsedEmployeeCode = Number(employeeCodeCookie)
 
-    return Number.isNaN(parsedEmployeeCode) ? undefined : parsedEmployeeCode
+    // return Number.isNaN(parsedEmployeeCode) ? undefined : parsedEmployeeCode
+    return Number.isNaN(parsedEmployeeCode) ? undefined : employeeCodeCookie
 }
 
 export const useGetEmployeeCode = () => {
-    const [employeeCode, setEmployeeCode] = useState<number>()
+    // const [employeeCode, setEmployeeCode] = useState<number>()
+    const [employeeCode, setEmployeeCode] = useState<string>()
 
     useEffect(() => {
         let intervalId: number | null = null
