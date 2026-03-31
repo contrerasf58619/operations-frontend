@@ -110,23 +110,26 @@ export const useTeamAttendances = (
     )
 
     const handleSaveAll = useCallback(async () => {
-        const userPayload: AttendancePayload = {
-            uadId: selectedUad,
-            responsable: employeeCode, // Default or currently logged in responsible id
-            attendances: attendancesByUser,
+        try {
+            setSaving(true)
+
+            const userPayload: AttendancePayload = {
+                uadId: selectedUad,
+                responsable: employeeCode,
+                attendances: attendancesByUser,
+            }
+
+            const res = await attendanceApi.saveAttendance(userPayload)
+
+            toast.success('Asistencia guardada correctamente')
+            console.log('Save attendance response', res)
+        } catch (err) {
+            console.error('Error saving attendance', err)
+            toast.error('No se pudieron guardar las asistencias')
+        } finally {
+            setSaving(false)
         }
-        setSaving(true)
-        attendanceApi
-            .saveAttendance(userPayload)
-            .then(res => {
-                toast.success('Asistencia guardada correctamente')
-            })
-            .catch(err => {
-                console.error('Error saving attendance', err)
-                toast.error('No se pudieron guardar las asistencias')
-            })
-            .finally(() => setSaving(false))
-    }, [attendancesByUser, selectedUad])
+    }, [attendancesByUser, selectedUad, employeeCode])
 
     return {
         users,

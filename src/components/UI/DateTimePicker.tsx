@@ -2,7 +2,7 @@
 import { FC } from 'react'
 
 import DatePicker, { registerLocale } from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css' 
+import 'react-datepicker/dist/react-datepicker.css'
 import { useTranslations, useLocale } from 'next-intl'
 import { useDateContext } from '@/context/UI/DateContext'
 import { CustomTitle } from './Custom/CustomTitle'
@@ -13,7 +13,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 // Importar los locales de date-fns
 import { es } from 'date-fns/locale'
 import { enUS } from 'date-fns/locale'
-
 
 // Registrar los locales
 registerLocale('es', es)

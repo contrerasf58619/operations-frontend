@@ -9,22 +9,22 @@ if (!api) {
 }
 
 export interface AttendancePayload {
-    uadId: string,
-    responsable: string | undefined,
+    uadId: string
+    responsable: string | undefined
     attendances: {
-        agent_roster: number,
-        name: string,
+        agent_roster: number
+        name: string
         fechas: {
-            attendance_type: string | null,
-            fecha: string,
+            attendance_type: string | null
+            fecha: string
             weekend: boolean
         }[]
     }[]
 }
 
 export interface PayrollPeriod {
-    date_from: string;
-    date_to: string;
+    date_from: string
+    date_to: string
 }
 
 export const attendanceApi = {
