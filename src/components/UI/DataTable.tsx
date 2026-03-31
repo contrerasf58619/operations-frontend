@@ -40,7 +40,7 @@ export function DataTable<T>({
             })
         })
     }, [data, searchValue])
-
+    console.log('loading', loading)
     const totalItems = filteredData.length
 
     // Obtener las filas visibles de la tabla filtrada

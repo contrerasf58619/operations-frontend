@@ -37,6 +37,7 @@ export const Register = () => {
                 await register(values.dpi, values.employeeCode, values.email)
                 helpers.resetForm()
             } catch (err) {
+                console.log(err)
                 setMessage('Something went wrong, please try again.')
             } finally {
                 helpers.setSubmitting(false)

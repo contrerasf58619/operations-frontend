@@ -11,7 +11,7 @@ if (!api) {
 
 export const conexionNetaApi = {
     getConexionNeta(startDate: string, endDate: string, uadId: number) {
-        const route = baseURL(api, 'conexion-neta/gt',{startDate, endDate, uadId})
+        const route = baseURL(api, 'conexion-neta/gt', { startDate, endDate, uadId })
         return axios.get(route, { headers: getHeaders() })
-    }
+    },
 }

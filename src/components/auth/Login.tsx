@@ -34,6 +34,7 @@ export const Login = () => {
                 await handleLogin(values.username, values.password)
                 helpers.resetForm()
             } catch (err) {
+                console.log(err)
                 setErrorMessage('Username or password is incorrect')
             } finally {
                 helpers.setSubmitting(false)

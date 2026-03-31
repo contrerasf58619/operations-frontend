@@ -1,6 +1,6 @@
 'use client'
 
-import { UadList } from '../catalogs/UadList'
+// import { UadList } from '../catalogs/UadList'
 // import { ConexionNetaTable } from "./ConexionNetaTable"
 import { ConexionNetaOpe } from './operaciones/ConexionNetaOpe'
 

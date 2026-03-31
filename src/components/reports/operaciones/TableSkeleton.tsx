@@ -1,4 +1,4 @@
-const SKELETON_ROW_COUNT = 8
+const skeletonRowsCount = 8
 
 function SkeletonCell({ index }: { index: number }) {
     const widths = ['w-12', 'w-40', 'w-20', 'w-16', 'w-24', 'w-16', 'w-20']
@@ -13,7 +13,7 @@ function SkeletonCell({ index }: { index: number }) {
 export function TableSkeleton({ columns }: { columns: number }) {
     return (
         <>
-            {Array.from({ length: SKELETON_ROW_COUNT }).map((_, rowIndex) => (
+            {Array.from({ length: skeletonRowsCount }).map((_, rowIndex) => (
                 <tr key={rowIndex} className='border-b border-slate-100'>
                     {Array.from({ length: columns }).map((_, colIndex) => (
                         <SkeletonCell key={colIndex} index={colIndex} />
