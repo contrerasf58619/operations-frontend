@@ -67,7 +67,7 @@ export const SidebarProvider: FC<React.PropsWithChildren> = ({ children }) => {
 
             try {
                 if (employeeCode) {
-                    const resp = await catalogsApi.getMenus(Number(employeeCode))
+                    const resp = await catalogsApi.getMenus(employeeCode)
 
                     const transformedData = transformMenuData(resp.data.data)
 

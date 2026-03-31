@@ -2,7 +2,7 @@
 
 import { getInitials } from '@/utils/getInitials'
 import Link from 'next/link'
-import { TopBar } from '../UI/TopBar/TopBar'
+// import { TopBar } from '../UI/TopBar/TopBar'
 
 export type UserSummary = {
     name?: string

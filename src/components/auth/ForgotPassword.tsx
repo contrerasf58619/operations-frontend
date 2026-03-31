@@ -35,6 +35,7 @@ export const ForgotPassword = () => {
                 helpers.resetForm()
             } catch (err) {
                 setMessage('Something went wrong, please try again.')
+                console.log(err)
             } finally {
                 helpers.setSubmitting(false)
             }
