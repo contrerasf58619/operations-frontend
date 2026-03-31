@@ -61,7 +61,7 @@ export function useUserUadList() {
                 const [allUadsResponse, userUadsResponse] = await Promise.all([
                     uadApi.getAllUADs(),
                     employeeCode !== undefined
-                        ? uadApi.getUADs(employeeCode)
+                        ? uadApi.getUADs(+employeeCode)
                         : Promise.resolve({ data: { status: 200, data: [] } }),
                 ])
 
