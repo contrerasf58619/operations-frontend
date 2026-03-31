@@ -120,6 +120,7 @@ export const useTeamAttendances = (
             .saveAttendance(userPayload)
             .then(res => {
                 toast.success('Asistencia guardada correctamente')
+                console.log('Save attendance response', res)
             })
             .catch(err => {
                 console.error('Error saving attendance', err)
