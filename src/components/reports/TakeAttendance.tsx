@@ -74,7 +74,7 @@ const TakeAttendance: React.FC = () => {
         <div className='p-6 bg-gray-50 min-h-screen'>
             <div className='max-w-7xl mx-auto'>
                 <h1 className='text-4xl font-bold mb-2 text-gray-900'>
-                    Fill your team's attendance
+                    Fill your teams attendance
                 </h1>
                 <p className='text-gray-600 mb-8'>
                     Registra y administra la asistencia de tu equipo
