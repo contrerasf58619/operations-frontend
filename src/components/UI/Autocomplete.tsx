@@ -24,7 +24,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
     disabled = false,
     className = '',
     noOptionsText = 'No se encontraron opciones',
-    id
+    id,
 }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState('')
@@ -149,10 +149,11 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
                                         setInputValue(option.label)
                                         setIsOpen(false)
                                     }}
-                                    className={`w-full text-left px-3 py-2 hover:bg-blue-50 transition-colors ${option.value === value
-                                        ? 'bg-blue-100 font-medium text-blue-900'
-                                        : 'text-gray-700'
-                                        }`}
+                                    className={`w-full text-left px-3 py-2 hover:bg-blue-50 transition-colors ${
+                                        option.value === value
+                                            ? 'bg-blue-100 font-medium text-blue-900'
+                                            : 'text-gray-700'
+                                    }`}
                                 >
                                     {option.label}
                                 </button>
