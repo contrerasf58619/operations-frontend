@@ -25,7 +25,7 @@ export const Tabs: React.FC<TabsProps> = ({ activeTab, onChange, children }) => 
     return (
         <>
             <div className='border-b border-gray-200 mb-4'>
-                <nav className='-mb-px flex space-x-8' aria-label='Tabs' role='tablist'>
+                <div className='-mb-px flex space-x-8' aria-label='Tabs' role='tablist'>
                     {tabs.map(tab => {
                         const { id, label } = tab.props
                         const isActive = activeTab === id
@@ -48,7 +48,7 @@ export const Tabs: React.FC<TabsProps> = ({ activeTab, onChange, children }) => 
                             </button>
                         )
                     })}
-                </nav>
+                </div>
             </div>
 
             <div role='tabpanel' aria-labelledby={activeTab}>
