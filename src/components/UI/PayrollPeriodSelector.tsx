@@ -23,7 +23,7 @@ export const PayrollPeriodSelector: React.FC<PayrollPeriodSelectorProps> = ({
     loading = false,
     disabled = false,
     errorText,
-    id
+    id,
 }) => {
     return (
         <div className='space-y-4'>
