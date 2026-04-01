@@ -103,16 +103,15 @@ const TakeAttendance: React.FC = () => {
                             </div>
                         </div>
 
-                        <label
-                            htmlFor='payroll'
-                            className='block text-sm font-semibold text-gray-900 mb-4'
-                        >
-                            Periodo de nómina
-                        </label>
-
-                        <div className='mt-2'>
+                        <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+                            <label
+                                htmlFor='payroll'
+                                className='block text-sm font-semibold text-gray-900 mb-4'
+                            >
+                                Periodo de nómina
+                            </label>
                             <PayrollPeriodSelector
-                                // id='payroll'
+                                id='payroll'
                                 payrollPeriods={payrollPeriods}
                                 selectedPayrollPeriod={selectedPayrollPeriod}
                                 onChange={period => {
@@ -135,7 +134,7 @@ const TakeAttendance: React.FC = () => {
 
                             <div className='space-y-2'>
                                 <Autocomplete
-                                    // id='leader'
+                                    id='leader'
                                     value={selectedLeader}
                                     onChange={val => {
                                         setSelectedLeader(val as string)
