@@ -13,6 +13,7 @@ export interface AutocompleteProps {
     disabled?: boolean
     className?: string
     noOptionsText?: string
+    id?: string
 }
 
 export const Autocomplete: React.FC<AutocompleteProps> = ({
@@ -23,6 +24,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
     disabled = false,
     className = '',
     noOptionsText = 'No se encontraron opciones',
+    id,
 }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState('')
@@ -76,6 +78,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
         <div ref={wrapperRef} className={`relative w-full ${className}`}>
             <div className='relative w-full'>
                 <input
+                    id={id}
                     ref={inputRef}
                     type='text'
                     value={inputValue}
@@ -87,7 +90,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
                     placeholder={placeholder}
                     disabled={disabled}
                     autoComplete='off'
-                    className='w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:bg-gray-100 disabled:text-gray-500'
+                    className='w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg transition-colors disabled:bg-gray-100 disabled:text-gray-500'
                 />
                 {/* Icons */}
                 <div className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400'>

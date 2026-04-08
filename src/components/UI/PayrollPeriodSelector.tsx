@@ -13,6 +13,7 @@ interface PayrollPeriodSelectorProps {
     loading?: boolean
     disabled?: boolean
     errorText?: string | React.ReactNode
+    id?: string
 }
 
 export const PayrollPeriodSelector: React.FC<PayrollPeriodSelectorProps> = ({
@@ -22,10 +23,12 @@ export const PayrollPeriodSelector: React.FC<PayrollPeriodSelectorProps> = ({
     loading = false,
     disabled = false,
     errorText,
+    id,
 }) => {
     return (
         <div className='space-y-4'>
             <select
+                id={id}
                 value={
                     selectedPayrollPeriod
                         ? `${dayjs(selectedPayrollPeriod.date_from).format('YYYY-MM-DD')} a ${dayjs(selectedPayrollPeriod.date_to).format('YYYY-MM-DD')}`
@@ -37,7 +40,7 @@ export const PayrollPeriodSelector: React.FC<PayrollPeriodSelectorProps> = ({
                         onChange({ date_from: start.trim(), date_to: end.trim() })
                     }
                 }}
-                className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors'
+                className='w-full p-2 border rounded disabled:bg-gray-100 disabled:text-gray-500'
                 disabled={disabled || loading || payrollPeriods.length === 0}
             >
                 {payrollPeriods.map(p => (
