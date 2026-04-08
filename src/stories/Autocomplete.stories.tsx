@@ -32,6 +32,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
     args: {
+        onChange: () => {},
         options: sampleOptions,
         value: null,
         placeholder: 'Buscar empleado...',
