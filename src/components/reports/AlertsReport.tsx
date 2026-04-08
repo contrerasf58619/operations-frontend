@@ -88,6 +88,7 @@ const AlertsReport: React.FC = () => {
                         </label>
                         <div className='space-y-4'>
                             <UadList
+                                allUads={true}
                                 value={selectedUad}
                                 onChange={v => setSelectedUad(Number(v))}
                             />

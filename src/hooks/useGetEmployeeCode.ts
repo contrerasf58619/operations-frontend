@@ -1,70 +1,39 @@
-'use client'
 import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 
-function readEmployeeCode() {
-    const employeeCodeCookie = Cookies.get('employeeCode')
-
-    if (!employeeCodeCookie) {
-        return undefined
-    }
-
-    const parsedEmployeeCode = Number(employeeCodeCookie)
-
-    // return Number.isNaN(parsedEmployeeCode) ? undefined : parsedEmployeeCode
-    return Number.isNaN(parsedEmployeeCode) ? undefined : employeeCodeCookie
-}
-
 export const useGetEmployeeCode = () => {
-    // const [employeeCode, setEmployeeCode] = useState<number>()
-    const [employeeCode, setEmployeeCode] = useState<string>()
+    const [employeeCode, setEmployeeCode] = useState<string | undefined>(undefined)
 
     useEffect(() => {
-        let intervalId: number | null = null
+        let interval: NodeJS.Timeout | null = null
         let attempts = 0
-        const MAX_ATTEMPTS = 60
+        const MAX_ATTEMPTS = 60 // máximo 30 segundos (60 * 500ms)
 
-        const syncEmployeeCode = () => {
+        const checkCookie = () => {
             try {
-                const nextEmployeeCode = readEmployeeCode()
+                const employeeCodeCookie = Cookies.get('employeeCode')
 
-                if (nextEmployeeCode === undefined) {
-                    attempts += 1
-
-                    if (attempts >= MAX_ATTEMPTS && intervalId !== null) {
-                        window.clearInterval(intervalId)
-                    }
-
-                    return false
+                if (employeeCodeCookie) {
+                    setEmployeeCode(employeeCodeCookie)
+                    if (interval) clearInterval(interval)
+                    return
                 }
 
-                setEmployeeCode(nextEmployeeCode)
-                return true
+                attempts++
+                if (attempts >= MAX_ATTEMPTS) {
+                    if (interval) clearInterval(interval)
+                }
             } catch (error) {
-                console.error('Error reading employeeCode cookie:', error)
-
-                if (intervalId !== null) {
-                    window.clearInterval(intervalId)
-                }
-
-                return true
+                console.error('Error reading cookie:', error)
+                if (interval) clearInterval(interval)
             }
         }
 
-        if (syncEmployeeCode()) {
-            return
-        }
-
-        intervalId = window.setInterval(() => {
-            if (syncEmployeeCode() && intervalId !== null) {
-                window.clearInterval(intervalId)
-            }
-        }, 500)
+        checkCookie()
+        interval = setInterval(checkCookie, 500)
 
         return () => {
-            if (intervalId !== null) {
-                window.clearInterval(intervalId)
-            }
+            if (interval) clearInterval(interval)
         }
     }, [])
 
