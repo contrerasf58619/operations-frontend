@@ -105,7 +105,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
     args: {
         data: sampleEmployees,
-        columns: employeeColumns,
+        columns: employeeColumns as any,
         noDataText: 'No hay empleados registrados.',
         searchPlaceholder: 'Buscar empleado...',
     },
