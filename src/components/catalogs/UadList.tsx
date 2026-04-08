@@ -3,14 +3,17 @@
 import { ChangeEvent, useEffect } from 'react'
 import { useUserUadList } from '@/hooks/useUserUadList'
 import { useUadContext } from '@/context/uad/UadContext'
+import { useGetEmployeeCode } from '@/hooks'
 
 interface UadListProps {
     value?: string | number
     onChange?: (value: string) => void
+    allUads?: boolean
 }
 
-export function UadList({ value, onChange }: UadListProps) {
-    const { options, loading } = useUserUadList()
+export function UadList({ value, onChange, allUads }: UadListProps) {
+    const { employeeCode } = useGetEmployeeCode()
+    const { options, loading } = useUserUadList(Number(employeeCode), allUads)
     const { selectedUad, setSelectedUad } = useUadContext()
 
     const currentValue =
