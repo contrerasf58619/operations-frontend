@@ -58,8 +58,8 @@ const TakeAttendance: React.FC = () => {
     const getDatesInRange = useCallback((): Dayjs[] => {
         if (!startDate || !endDate) return []
         const dates: Dayjs[] = []
-        let current = dayjs(startDate)
-        const end = dayjs(endDate)
+        let current = dayjs(startDate).utc()
+        const end = dayjs(endDate).utc()
 
         while (current.isBefore(end) || current.isSame(end)) {
             dates.push(current)

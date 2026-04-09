@@ -50,17 +50,17 @@ export const AttendanceTable: FC<AttendanceTableProps> = ({
                                     </th>
                                     {dates.map(date => (
                                         <th
-                                            key={date.format('YYYY-MM-DD')}
+                                            key={date.locale('es').format('YYYY-MM-DD')}
                                             className='px-2 py-2 text-center font-bold text-gray-900 border-l border-gray-300 min-w-15'
                                         >
                                             <div className='text-xs font-bold uppercase tracking-wide'>
-                                                {date.format('ddd')}
+                                                {date.locale('es').format('ddd')}
                                             </div>
                                             <div className='text-sm font-bold'>
-                                                {date.format('DD')}
+                                                {date.locale('es').format('DD')}
                                             </div>
-                                            <div className='text-xs text-gray-600'>
-                                                {date.format('MMM')}
+                                            <div className='text-xs text-gray-600 uppercase'>
+                                                {date.locale('es').format('MMM')}
                                             </div>
                                         </th>
                                     ))}
