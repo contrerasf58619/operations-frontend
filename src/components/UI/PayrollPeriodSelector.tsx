@@ -1,6 +1,6 @@
 import React from 'react'
 import dayjs from 'dayjs'
-require('dayjs/locale/es')
+import 'dayjs/locale/es'
 
 export interface PayrollPeriod {
     date_from: string
