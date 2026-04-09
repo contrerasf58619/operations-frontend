@@ -43,9 +43,6 @@ export const useLeaders = (
                 if (currentLeader) {
                     setSelectedLeader(currentLeader.sup_code)
                 }
-                if (data.length > 0 && !currentLeader) {
-                    setSelectedLeader(data[0].sup_code)
-                }
             })
             .catch(err => {
                 console.error('Error fetching leaders', err)

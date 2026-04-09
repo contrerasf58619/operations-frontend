@@ -8,9 +8,11 @@ import { useSidebarContext } from '@/context/sidebar/SideBarContex'
 import { getInitials } from '@/utils/getInitials'
 import { useAuthContext } from '@/context/auth/AuthContext'
 import { CheckOutsideClick } from '../CheckOutsideClick'
+import { useEmployeeContext } from '@/context/employee/EmployeeContext'
 
 export const TopBar = () => {
-    const name = 'Kunu Lee'
+    const { employee } = useEmployeeContext()
+    const name = `${employee?.employee.contacto.NOMBRE1} ${employee?.employee.contacto.APELLIDO1}`
     const { onOpenSideBar } = useSidebarContext()
     const [openMenu, setOpenMenu] = useState<boolean>(false)
     const { handleLogout } = useAuthContext()
