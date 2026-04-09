@@ -31,7 +31,7 @@ export const useTeamAttendances = (
     }, [selectedUad])
 
     useEffect(() => {
-        if (!selectedLeader || !selectedUad || !startDate || !endDate) return
+        if (!selectedUad || !startDate || !endDate) return
 
         const userPayload: any = {
             uadId: selectedUad,

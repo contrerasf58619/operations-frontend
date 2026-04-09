@@ -1,5 +1,6 @@
 import React from 'react'
 import dayjs from 'dayjs'
+import 'dayjs/locale/es'
 
 export interface PayrollPeriod {
     date_from: string
@@ -31,7 +32,7 @@ export const PayrollPeriodSelector: React.FC<PayrollPeriodSelectorProps> = ({
                 id={id}
                 value={
                     selectedPayrollPeriod
-                        ? `${dayjs(selectedPayrollPeriod.date_from).format('YYYY-MM-DD')} a ${dayjs(selectedPayrollPeriod.date_to).format('YYYY-MM-DD')}`
+                        ? `${dayjs(selectedPayrollPeriod.date_from).utc().format('YYYY-MM-DD')} a ${dayjs(selectedPayrollPeriod.date_to).utc().format('YYYY-MM-DD')}`
                         : ''
                 }
                 onChange={e => {
@@ -46,10 +47,10 @@ export const PayrollPeriodSelector: React.FC<PayrollPeriodSelectorProps> = ({
                 {payrollPeriods.map(p => (
                     <option
                         key={`${p.date_from}-${p.date_to}`}
-                        value={`${dayjs(p.date_from).format('YYYY-MM-DD')} a ${dayjs(p.date_to).format('YYYY-MM-DD')}`}
+                        value={`${dayjs(p.date_from).utc().format('YYYY-MM-DD')} a ${dayjs(p.date_to).utc().format('YYYY-MM-DD')}`}
                     >
-                        {dayjs(p.date_from).format('YYYY-MM-DD')} -{' '}
-                        {dayjs(p.date_to).format('YYYY-MM-DD')}
+                        {dayjs(p.date_from).utc().locale('es').format('D [de] MMMM [de] YYYY')} -{' '}
+                        {dayjs(p.date_to).utc().locale('es').format('D [de] MMMM [de] YYYY')}
                     </option>
                 ))}
             </select>

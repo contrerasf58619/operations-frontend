@@ -1,6 +1,7 @@
 'use client'
 
 import { getInitials } from '@/utils/getInitials'
+import { useEmployeeContext } from '@/context/employee/EmployeeContext'
 import Link from 'next/link'
 // import { TopBar } from '../UI/TopBar/TopBar'
 
@@ -12,12 +13,14 @@ export type UserSummary = {
     department?: string
 }
 
-export const Home = ({ user = {} as UserSummary }: { user?: UserSummary }) => {
-    const name = user.name || 'Kunu Lee'
-    const role = user.role || 'Software Engineer I'
-    const email = user.email || 'kunu.lr@alliedgloba.com'
-    const dept = user.department || 'Department'
-    const location = user.location || 'Location'
+export const Home = () => {
+    const { employee } = useEmployeeContext()
+
+    const name = `${employee?.employee.contacto.NOMBRE1} ${employee?.employee.contacto.APELLIDO1}`
+
+    const role = `${employee?.employee.puesto.PUESTO}`
+    const dept = `${employee?.employee.departamento.DEPARTAMENTO}`
+    const location = `${employee?.employee.contacto.COD_PAIS}`
 
     return (
         <div className='h-[100%] bg-white text-[#131416] flex flex-col'>
@@ -28,7 +31,10 @@ export const Home = ({ user = {} as UserSummary }: { user?: UserSummary }) => {
                     <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4'>
                         <div>
                             <h2 className='text-3xl font-bold tracking-tight'>
-                                Welcome back{name !== 'Your name' ? `, ${name}` : ''}
+                                Welcome back
+                                <span className='capitalize'>
+                                    {name !== 'Your name' ? `, ${name.toLocaleLowerCase()}` : ''}
+                                </span>
                             </h2>
                             <p className='text-gray-600 mt-1'>
                                 Here’s a quick overview of your profile and shortcuts.
@@ -51,7 +57,6 @@ export const Home = ({ user = {} as UserSummary }: { user?: UserSummary }) => {
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-2 gap-4 text-sm'>
-                                    <InfoRow label='Email' value={email} />
                                     <InfoRow label='Department' value={dept} />
                                     <InfoRow label='Location' value={location} />
                                     <InfoRow label='Status' value='Active' />
@@ -64,28 +69,10 @@ export const Home = ({ user = {} as UserSummary }: { user?: UserSummary }) => {
                             <h3 className='font-semibold mb-3'>Quick actions</h3>
                             <div className='grid grid-cols-1 gap-3 text-sm'>
                                 <Link
-                                    href='/directory'
+                                    href='/reports/take-attendance'
                                     className='rounded-xl border border-gray-200 px-4 py-3 hover:border-[#0FA3B1]'
                                 >
-                                    General Report
-                                </Link>
-                                <Link
-                                    href='/teams'
-                                    className='rounded-xl border border-gray-200 px-4 py-3 hover:border-[#0FA3B1]'
-                                >
-                                    Staffed Time
-                                </Link>
-                                <Link
-                                    href='/tickets/new'
-                                    className='rounded-xl px-4 py-3 font-semibold text-white bg-gradient-to-r from-[#FFB100] via-[#F08A00] to-[#C96E00] hover:opacity-90'
-                                >
-                                    Execute Process
-                                </Link>
-                                <Link
-                                    href='/settings'
-                                    className='rounded-xl border border-gray-200 px-4 py-3 hover:border-[#0FA3B1]'
-                                >
-                                    WF Review
+                                    Take Attendance
                                 </Link>
                             </div>
                         </div>
