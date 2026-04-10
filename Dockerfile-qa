@@ -61,7 +61,7 @@ WORKDIR /app
 
 RUN apt-get update && \
  apt-get install -y --no-install-recommends dumb-init && \
- rm -rf /var/lib/apt/lists/\* && \
+ rm -rf /var/lib/apt/lists/* && \
  groupadd --system --gid 1001 nodejs && \
  useradd --system --uid 1001 --gid 1001 nextjs
 
