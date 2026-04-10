@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { getHeaders } from '@/utils'
 import { baseURL } from './baseURL'
+import { HoursOnTheWorkdayAlertResponse, HoursonVacationAlertResponse } from '@/interfaces'
 
 const api = process.env.NEXT_PUBLIC_URL_UAD_NEST
 
@@ -45,5 +46,21 @@ export const alertsApi = {
     getOvertime(payload: OvertimePayload) {
         const route = baseURL(api, 'alerts/overtime')
         return axios.get<OvertimeAlertResponse[]>(route, { headers: getHeaders(), params: payload })
+    },
+
+    getHoursOnTheWorkday(payload: OvertimePayload) {
+        const route = baseURL(api, 'alerts/hours-on-the-workday')
+        return axios.get<HoursOnTheWorkdayAlertResponse[]>(route, {
+            headers: getHeaders(),
+            params: payload,
+        })
+    },
+
+    getHoursOnVacation(payload: OvertimePayload) {
+        const route = baseURL(api, 'alerts/hours-on-vacation')
+        return axios.get<HoursonVacationAlertResponse[]>(route, {
+            headers: getHeaders(),
+            params: payload,
+        })
     },
 }
