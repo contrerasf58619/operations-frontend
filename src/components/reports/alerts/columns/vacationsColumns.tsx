@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { getPercentageColor } from '../AlertsReport'
 
-interface columnsInterface {
+interface ColumnsInterface {
     roster_id: number
     semana: string
     horas_asueto: string
@@ -9,7 +9,7 @@ interface columnsInterface {
     porcentaje: number
 }
 
-export const columnsVacations: ColumnDef<columnsInterface>[] = [
+export const columnsVacations: ColumnDef<ColumnsInterface>[] = [
     {
         accessorKey: 'roster_id',
         header: 'Roster ID',
