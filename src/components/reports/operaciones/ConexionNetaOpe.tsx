@@ -4,7 +4,6 @@ import { UadList } from '@/components/catalogs/UadList'
 import { CustomTitle } from '@/components/UI/Custom/CustomTitle'
 import { CustomDatePicker } from '@/components/UI/DateTimePicker'
 import { useDateContext } from '@/context/UI/DateContext'
-import { useUadContext } from '@/context/uad/UadContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type { ConexionNetaOpeDatum } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
@@ -67,13 +66,14 @@ const disabledBtn =
     'cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-100 hover:border-slate-200 active:scale-100'
 
 export const ConexionNetaOpe = () => {
-    const { selectedUad } = useUadContext()
+    // const { selectedUad } = useUadContext()
     const { dateRange } = useDateContext()
     const { data, dataGT, loading, loadingGT, error, fetchConexionNeta, fetchConexionNetaGT } =
         useConexionNetaOpe()
     const [currentPage, setCurrentPage] = useState(1)
-    const [rowsPerPage, setRowsPerPage] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(20)
+    const [rowsPerPage, setRowsPerPage] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(5)
     const [searchQuery, setSearchQuery] = useState('')
+    const [selectedUad, setSelectedUad] = useState<number>(0)
     const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
 
     useEffect(() => {
@@ -166,9 +166,22 @@ export const ConexionNetaOpe = () => {
                     </p>
                 </div>
                 <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
-                    <CustomDatePicker />
-                    <div className='min-w-[220px]'>
-                        <UadList />
+                    <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+                        <CustomDatePicker />
+                    </div>
+                    <div className='bg-white p-8 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
+                        <label
+                            htmlFor='uad'
+                            className='block text-sm font-semibold text-gray-900 mb-4'
+                        >
+                            UAD
+                        </label>
+                        <div className='space-y-4'>
+                            <UadList
+                                value={selectedUad}
+                                onChange={v => setSelectedUad(Number(v))}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
