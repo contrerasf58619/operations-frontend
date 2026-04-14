@@ -69,7 +69,7 @@ export const Home = () => {
                             <h3 className='font-semibold mb-3'>Quick actions</h3>
                             <div className='grid grid-cols-1 gap-3 text-sm'>
                                 <Link
-                                    href='/reports/take-attendance'
+                                    href='/attendances/take-attendance'
                                     className='rounded-xl border border-gray-200 px-4 py-3 hover:border-[#0FA3B1]'
                                 >
                                     Take Attendance
