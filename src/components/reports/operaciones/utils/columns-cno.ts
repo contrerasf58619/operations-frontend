@@ -221,7 +221,7 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
     },
     {
         id: 'HORAS_EXTRA_SEG',
-        label: 'Horas Extra Seg',
+        label: 'Horas Extra',
         sourceKeys: ['HORAS_EXTRA_SEG'],
         render: row => formatValue(row.HORAS_EXTRA_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
