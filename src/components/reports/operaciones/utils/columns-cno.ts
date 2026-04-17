@@ -95,7 +95,7 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
     },
     {
         id: 'CALCULATED_LAW_HOURS',
-        label: 'Calculated Law Hours',
+        label: 'Law Hours Calc',
         sourceKeys: ['CALCULATED_LAW_HOURS'],
         render: row => formatValue(row.CALCULATED_LAW_HOURS),
         cellClassName: 'font-mono whitespace-nowrap',
@@ -221,7 +221,7 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
     },
     {
         id: 'HORAS_EXTRA_SEG',
-        label: 'Horas Extra Seg',
+        label: 'Horas Extra',
         sourceKeys: ['HORAS_EXTRA_SEG'],
         render: row => formatValue(row.HORAS_EXTRA_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
@@ -235,14 +235,14 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
     },
     {
         id: 'HORAS_JORNADA_SEG',
-        label: 'Horas Jornada Seg',
+        label: 'Horas Jornada',
         sourceKeys: ['HORAS_JORNADA_SEG'],
         render: row => formatValue(row.HORAS_JORNADA_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
         id: 'HORAS_DESCUENTO_SEG',
-        label: 'Horas Descuento Seg',
+        label: 'Horas Descuento',
         sourceKeys: ['HORAS_DESCUENTO_SEG'],
         render: row => formatValue(row.HORAS_DESCUENTO_SEG),
         cellClassName: 'font-mono whitespace-nowrap',
