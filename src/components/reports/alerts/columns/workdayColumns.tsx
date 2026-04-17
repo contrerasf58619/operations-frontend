@@ -15,7 +15,7 @@ export const columnsWorkday: ColumnDef<ColumnsInterface>[] = [
         header: 'Roster ID',
     },
     {
-        accessorKey: 'semana',
+        accessorKey: 'week_start_date',
         header: 'Semana',
     },
     {
@@ -26,15 +26,4 @@ export const columnsWorkday: ColumnDef<ColumnsInterface>[] = [
         accessorKey: 'wp_hours',
         header: 'Horas WP',
     },
-    // {
-    //     accessorKey: 'porcentaje',
-    //     header: 'Porcentaje',
-    //     cell: info => (
-    //         <span
-    //             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getPercentageColor(Number(info.getValue()))}`}
-    //         >
-    //             {info.getValue() as number}%
-    //         </span>
-    //     ),
-    // },
 ]
