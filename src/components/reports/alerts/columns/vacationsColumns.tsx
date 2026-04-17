@@ -15,7 +15,7 @@ export const columnsVacations: ColumnDef<ColumnsInterface>[] = [
         header: 'Roster ID',
     },
     {
-        accessorKey: 'semana',
+        accessorKey: 'week_start_date',
         header: 'Semana',
     },
     {
