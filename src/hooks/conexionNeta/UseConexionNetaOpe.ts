@@ -3,11 +3,14 @@ import {
     conexionNetaOperacionesApi,
     ConexionNetaOpeParams,
 } from '@/api/conexion-neta/conexion-neta-operaciones.api'
-import { ConexionNetaOpeDatum } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
+import {
+    DatumGT,
+    DatumWild,
+} from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 
 interface UseConexionNetaOpeState {
-    data: ConexionNetaOpeDatum[]
-    dataGT: ConexionNetaOpeDatum[]
+    data: DatumWild[]
+    dataGT: DatumGT[]
     loading: boolean
     loadingGT: boolean
     error: string | null
