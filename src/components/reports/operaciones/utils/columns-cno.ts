@@ -1,13 +1,13 @@
-import { ConexionNetaOpeDatum } from '../interfaces/ConexionNetaOpeRow.interface'
+import { DatumGT } from '../interfaces/ConexionNetaOpeRow.interface'
 import type { ReactNode } from 'react'
 
-type RowKey = keyof ConexionNetaOpeDatum
+type RowKey = keyof DatumGT
 
 type TableColumn = {
     id: string
     label: string
     sourceKeys: RowKey[]
-    render: (row: ConexionNetaOpeDatum) => ReactNode
+    render: (row: DatumGT) => ReactNode
     headerClassName?: string
     cellClassName?: string
 }
