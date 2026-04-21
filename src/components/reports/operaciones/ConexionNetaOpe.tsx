@@ -7,15 +7,19 @@ import { useDateContext } from '@/context/UI/DateContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type { DatumWild } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
-import { useEffect, useMemo, useState } from 'react'
-import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { MdChevronLeft, MdChevronRight, MdViewColumn } from 'react-icons/md'
 import { COLUMN_DEFINITIONS } from './utils/columns-cno'
 import { TableSkeleton } from './TableSkeleton'
 import { MdSearch, MdClose } from 'react-icons/md'
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
 
-const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'CONEXION_NETA']
+const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'NOMENCLATURA', 'FINAL']
+
+const ALL_COLUMN_IDS = COLUMN_DEFINITIONS.map(column => column.id)
+
+const VISIBLE_COLUMNS_STORAGE_KEY = 'conexion-neta-ope:visible-columns'
 
 const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
     'WP_HOURS',
@@ -40,10 +44,6 @@ function computeGroupMeta(rows: DatumWild[], columnId: keyof DatumWild): CellMet
     }
 
     return meta
-}
-
-function hasValue(value: unknown) {
-    return value !== null && value !== undefined && String(value).trim() !== ''
 }
 
 function sortRowsByRoster(leftRow: DatumWild, rightRow: DatumWild) {
@@ -71,7 +71,72 @@ export const ConexionNetaOpe = () => {
     const [rowsPerPage, setRowsPerPage] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(5)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedUad, setSelectedUad] = useState<number>(0)
+    const [visibleColumnIds, setVisibleColumnIds] = useState<string[]>(FALLBACK_COLUMN_IDS)
+    const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false)
+    const columnSelectorRef = useRef<HTMLDivElement>(null)
     const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
+
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem(VISIBLE_COLUMNS_STORAGE_KEY)
+            if (!raw) return
+            const parsed: unknown = JSON.parse(raw)
+            if (!Array.isArray(parsed)) return
+            const sanitized = parsed.filter(
+                (id): id is string => typeof id === 'string' && ALL_COLUMN_IDS.includes(id),
+            )
+            if (sanitized.length > 0) {
+                setVisibleColumnIds(sanitized)
+            }
+        } catch {
+            // ignore unreadable/corrupt storage
+        }
+    }, [])
+
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                VISIBLE_COLUMNS_STORAGE_KEY,
+                JSON.stringify(visibleColumnIds),
+            )
+        } catch {
+            // ignore quota / disabled storage
+        }
+    }, [visibleColumnIds])
+
+    useEffect(() => {
+        if (!isColumnSelectorOpen) return
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                columnSelectorRef.current &&
+                !columnSelectorRef.current.contains(event.target as Node)
+            ) {
+                setIsColumnSelectorOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [isColumnSelectorOpen])
+
+    const toggleColumn = useCallback((columnId: string, checked: boolean) => {
+        setVisibleColumnIds(prev => {
+            if (checked) {
+                if (prev.includes(columnId)) return prev
+                const next = new Set([...prev, columnId])
+                return ALL_COLUMN_IDS.filter(id => next.has(id))
+            }
+            if (prev.length <= 1) return prev
+            return prev.filter(id => id !== columnId)
+        })
+    }, [])
+
+    const handleSelectAllColumns = useCallback(() => {
+        setVisibleColumnIds(ALL_COLUMN_IDS)
+    }, [])
+
+    const handleResetColumns = useCallback(() => {
+        setVisibleColumnIds(FALLBACK_COLUMN_IDS)
+    }, [])
 
     useEffect(() => {
         if (selectedUad === null) {
@@ -130,14 +195,9 @@ export const ConexionNetaOpe = () => {
     }, [pagedRows])
 
     const visibleColumns = useMemo(() => {
-        if (sortedRows.length === 0) {
-            return COLUMN_DEFINITIONS.filter(column => FALLBACK_COLUMN_IDS.includes(column.id))
-        }
-
-        return COLUMN_DEFINITIONS.filter(column =>
-            column.sourceKeys.some(sourceKey => sortedRows.some(row => hasValue(row[sourceKey]))),
-        )
-    }, [sortedRows])
+        const selected = new Set(visibleColumnIds)
+        return COLUMN_DEFINITIONS.filter(column => selected.has(column.id))
+    }, [visibleColumnIds])
 
     const summary = useMemo(() => {
         const uniqueRosters = new Set(filteredRows.map(row => row.ROSTER)).size
@@ -183,38 +243,128 @@ export const ConexionNetaOpe = () => {
                 </div>
             </div>
 
-            <div className='flex items-center gap-2 mb-4'>
-                <div className='relative flex-1 max-w-sm'>
-                    <MdSearch
-                        size={18}
-                        className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
-                    />
-                    <input
-                        type='text'
-                        placeholder='Buscar por roster o nombre...'
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        className='w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan focus:border-cyan transition-colors'
-                    />
+            <div className='flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between'>
+                <div className='flex flex-1 items-center gap-2'>
+                    <div className='relative flex-1 max-w-sm'>
+                        <MdSearch
+                            size={18}
+                            className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                        />
+                        <input
+                            type='text'
+                            placeholder='Buscar por roster o nombre...'
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className='w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-charcoal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan focus:border-cyan transition-colors'
+                        />
+                        {searchQuery && (
+                            <button
+                                type='button'
+                                onClick={() => setSearchQuery('')}
+                                className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
+                                aria-label='Limpiar búsqueda'
+                            >
+                                <MdClose size={16} />
+                            </button>
+                        )}
+                    </div>
                     {searchQuery && (
-                        <button
-                            type='button'
-                            onClick={() => setSearchQuery('')}
-                            className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
-                            aria-label='Limpiar búsqueda'
-                        >
-                            <MdClose size={16} />
-                        </button>
+                        <p className='text-sm text-slate-500 whitespace-nowrap'>
+                            <span className='font-semibold text-charcoal'>
+                                {filteredRows.length}
+                            </span>
+                            {' de '}
+                            <span className='font-semibold text-charcoal'>
+                                {sortedRows.length}
+                            </span>
+                            {' resultados'}
+                        </p>
                     )}
                 </div>
-                {searchQuery && (
-                    <p className='text-sm text-slate-500 whitespace-nowrap'>
-                        <span className='font-semibold text-charcoal'>{filteredRows.length}</span>
-                        {' de '}
-                        <span className='font-semibold text-charcoal'>{sortedRows.length}</span>
-                        {' resultados'}
-                    </p>
-                )}
+
+                <div className='relative self-end sm:self-auto' ref={columnSelectorRef}>
+                    <button
+                        type='button'
+                        onClick={() => setIsColumnSelectorOpen(open => !open)}
+                        aria-haspopup='menu'
+                        aria-expanded={isColumnSelectorOpen}
+                        className={`${baseBtn} ${secondaryBtn}`}
+                    >
+                        <MdViewColumn size={18} />
+                        Seleccionar columnas
+                        <span className='ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600'>
+                            {visibleColumnIds.length}/{ALL_COLUMN_IDS.length}
+                        </span>
+                    </button>
+
+                    {isColumnSelectorOpen && (
+                        <div
+                            role='menu'
+                            className='absolute right-0 z-20 mt-2 w-80 origin-top-right rounded-xl border border-slate-200 bg-white shadow-xl'
+                        >
+                            <div className='flex items-center justify-between border-b border-slate-200 px-4 py-3'>
+                                <span className='text-sm font-semibold text-charcoal'>
+                                    Columnas visibles
+                                </span>
+                                <div className='flex gap-3 text-xs font-semibold'>
+                                    <button
+                                        type='button'
+                                        onClick={handleSelectAllColumns}
+                                        className='text-orange-600 hover:text-orange-700'
+                                    >
+                                        Todas
+                                    </button>
+                                    <button
+                                        type='button'
+                                        onClick={handleResetColumns}
+                                        className='text-slate-500 hover:text-slate-700'
+                                    >
+                                        Por defecto
+                                    </button>
+                                </div>
+                            </div>
+                            <ul className='max-h-80 overflow-y-auto py-1'>
+                                {COLUMN_DEFINITIONS.map(column => {
+                                    const checked = visibleColumnIds.includes(column.id)
+                                    const isOnlySelected =
+                                        checked && visibleColumnIds.length === 1
+                                    return (
+                                        <li key={column.id}>
+                                            <label
+                                                className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors hover:bg-slate-50 ${
+                                                    isOnlySelected
+                                                        ? 'cursor-not-allowed opacity-60'
+                                                        : 'cursor-pointer'
+                                                }`}
+                                                title={
+                                                    isOnlySelected
+                                                        ? 'Debe permanecer al menos una columna visible'
+                                                        : undefined
+                                                }
+                                            >
+                                                <input
+                                                    type='checkbox'
+                                                    checked={checked}
+                                                    disabled={isOnlySelected}
+                                                    onChange={e =>
+                                                        toggleColumn(column.id, e.target.checked)
+                                                    }
+                                                    className='h-4 w-4 rounded border-slate-300 text-orange-500 focus:ring-orange-500'
+                                                />
+                                                <span className='text-slate-700'>
+                                                    {column.label}
+                                                </span>
+                                            </label>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                            <div className='border-t border-slate-200 bg-background-light px-4 py-2 text-xs text-slate-500'>
+                                {visibleColumnIds.length} de {ALL_COLUMN_IDS.length} seleccionadas
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className='bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
@@ -387,11 +537,12 @@ export const ConexionNetaOpe = () => {
             <div className='mt-8 grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='rounded-2xl border border-cyan bg-background-light p-6 shadow-sm'>
                     <div className='flex items-center gap-3 mb-3'>
-                        <h3 className='font-semibold text-charcoal'>Columnas Dinámicas</h3>
+                        <h3 className='font-semibold text-charcoal'>Columnas Personalizables</h3>
                     </div>
                     <p className='text-sm text-slate-600 leading-relaxed'>
-                        Las columnas se muestran únicamente cuando la data termine de cargar y
-                        retorna datos para ellas. Las columnas vacías se ocultan automáticamente.
+                        Usa el botón <span className='font-semibold'>Seleccionar columnas</span>{' '}
+                        para mostrar u ocultar columnas. Tu selección se guarda en el navegador y
+                        se mantiene en próximas visitas.
                     </p>
                 </div>
 

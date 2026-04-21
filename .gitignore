@@ -44,4 +44,4 @@ storybook-static
 CLAUDE.md
 .cluadeignore
 /.claude/settings.local.json
-/.claude/*
+/.claude
