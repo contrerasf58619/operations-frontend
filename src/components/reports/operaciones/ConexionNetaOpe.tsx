@@ -7,48 +7,20 @@ import { useDateContext } from '@/context/UI/DateContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type { DatumWild } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { MdChevronLeft, MdChevronRight, MdViewColumn } from 'react-icons/md'
-import { COLUMN_DEFINITIONS } from './utils/columns-cno'
+import { useEffect, useState } from 'react'
+import {
+    MdChevronLeft,
+    MdChevronRight,
+    MdClose,
+    MdSearch,
+    MdViewColumn,
+} from 'react-icons/md'
 import { TableSkeleton } from './TableSkeleton'
-import { MdSearch, MdClose } from 'react-icons/md'
-
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
-
-const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'NOMENCLATURA', 'FINAL']
-
-const ALL_COLUMN_IDS = COLUMN_DEFINITIONS.map(column => column.id)
-
-const VISIBLE_COLUMNS_STORAGE_KEY = 'conexion-neta-ope:visible-columns'
-
-const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
-    'WP_HOURS',
-    'LAW_HOURS',
-    'CALCULATED_LAW_HOURS',
-    'HORAS_EXTRA_SEG',
-])
-
-type CellMeta = { render: boolean; rowspan: number }
-
-function computeGroupMeta(rows: DatumWild[], columnId: keyof DatumWild): CellMeta[] {
-    const meta: CellMeta[] = rows.map(() => ({ render: true, rowspan: 1 }))
-
-    for (let i = rows.length - 1; i > 0; i--) {
-        const sameRoster = rows[i].ROSTER === rows[i - 1].ROSTER
-        const sameValue = String(rows[i][columnId]) === String(rows[i - 1][columnId])
-
-        if (sameRoster && sameValue) {
-            meta[i].render = false
-            meta[i - 1].rowspan += meta[i].rowspan
-        }
-    }
-
-    return meta
-}
-
-function sortRowsByRoster(leftRow: DatumWild, rightRow: DatumWild) {
-    return Number(leftRow.ROSTER) - Number(rightRow.ROSTER)
-}
+import {
+    PAGE_SIZE_OPTIONS,
+    useTableConexionNeta,
+    type PageSize,
+} from '@/hooks/conexionNeta/useTableConexionNeta'
 
 const baseBtn =
     'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1'
@@ -63,85 +35,35 @@ const disabledBtn =
     'cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-100 hover:border-slate-200 active:scale-100'
 
 export const ConexionNetaOpe = () => {
-    // const { selectedUad } = useUadContext()
     const { dateRange } = useDateContext()
     const { data, dataGT, loading, loadingGT, error, fetchConexionNeta, fetchConexionNetaGT } =
         useConexionNetaOpe()
-    const [currentPage, setCurrentPage] = useState(1)
-    const [rowsPerPage, setRowsPerPage] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(5)
-    const [searchQuery, setSearchQuery] = useState('')
     const [selectedUad, setSelectedUad] = useState<number>(0)
-    const [visibleColumnIds, setVisibleColumnIds] = useState<string[]>(FALLBACK_COLUMN_IDS)
-    const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false)
-    const columnSelectorRef = useRef<HTMLDivElement>(null)
     const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
 
-    useEffect(() => {
-        try {
-            const raw = localStorage.getItem(VISIBLE_COLUMNS_STORAGE_KEY)
-            if (!raw) return
-            const parsed: unknown = JSON.parse(raw)
-            if (!Array.isArray(parsed)) return
-            const sanitized = parsed.filter(
-                (id): id is string => typeof id === 'string' && ALL_COLUMN_IDS.includes(id),
-            )
-            if (sanitized.length > 0) {
-                setVisibleColumnIds(sanitized)
-            }
-        } catch {
-            // ignore unreadable/corrupt storage
-        }
-    }, [])
+    const activeRows: DatumWild[] = isGtUad ? dataGT : data
+    const activeLoading = isGtUad ? loadingGT : loading
+
+    const {
+        searchQuery,
+        setSearchQuery,
+        currentPage,
+        setCurrentPage,
+        rowsPerPage,
+        setRowsPerPage,
+        totalPages,
+        sortedRows,
+        filteredRows,
+        pagedRows,
+        visibleColumns,
+        groupMeta,
+        isGroupedColumn,
+        summary,
+        columnSelector,
+    } = useTableConexionNeta(activeRows)
 
     useEffect(() => {
-        try {
-            localStorage.setItem(
-                VISIBLE_COLUMNS_STORAGE_KEY,
-                JSON.stringify(visibleColumnIds),
-            )
-        } catch {
-            // ignore quota / disabled storage
-        }
-    }, [visibleColumnIds])
-
-    useEffect(() => {
-        if (!isColumnSelectorOpen) return
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                columnSelectorRef.current &&
-                !columnSelectorRef.current.contains(event.target as Node)
-            ) {
-                setIsColumnSelectorOpen(false)
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [isColumnSelectorOpen])
-
-    const toggleColumn = useCallback((columnId: string, checked: boolean) => {
-        setVisibleColumnIds(prev => {
-            if (checked) {
-                if (prev.includes(columnId)) return prev
-                const next = new Set([...prev, columnId])
-                return ALL_COLUMN_IDS.filter(id => next.has(id))
-            }
-            if (prev.length <= 1) return prev
-            return prev.filter(id => id !== columnId)
-        })
-    }, [])
-
-    const handleSelectAllColumns = useCallback(() => {
-        setVisibleColumnIds(ALL_COLUMN_IDS)
-    }, [])
-
-    const handleResetColumns = useCallback(() => {
-        setVisibleColumnIds(FALLBACK_COLUMN_IDS)
-    }, [])
-
-    useEffect(() => {
-        if (selectedUad === null) {
-            return
-        }
+        if (selectedUad === null) return
 
         const params = {
             startDate: dateRange[0],
@@ -156,61 +78,6 @@ export const ConexionNetaOpe = () => {
 
         void fetchConexionNeta(params)
     }, [dateRange, fetchConexionNeta, fetchConexionNetaGT, isGtUad, selectedUad])
-
-    const activeRows = isGtUad ? dataGT : data
-    const activeLoading = isGtUad ? loadingGT : loading
-
-    const sortedRows = useMemo(() => {
-        return [...activeRows].sort(sortRowsByRoster)
-    }, [activeRows])
-
-    const filteredRows = useMemo(() => {
-        const q = searchQuery.trim().toLowerCase()
-        if (!q) return sortedRows
-        return sortedRows.filter(
-            row =>
-                String(row.ROSTER).toLowerCase().includes(q) ||
-                row.NOMBRE.toLowerCase().includes(q),
-        )
-    }, [sortedRows, searchQuery])
-
-    const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage))
-
-    // Reset to page 1
-    useEffect(() => {
-        setCurrentPage(1)
-    }, [filteredRows, rowsPerPage])
-
-    const pagedRows = useMemo(() => {
-        const start = (currentPage - 1) * rowsPerPage
-        return filteredRows.slice(start, start + rowsPerPage)
-    }, [filteredRows, currentPage, rowsPerPage])
-
-    const groupMeta = useMemo(() => {
-        const map = new Map<keyof DatumWild, CellMeta[]>()
-        for (const colId of GROUPED_COLUMN_IDS) {
-            map.set(colId, computeGroupMeta(pagedRows, colId))
-        }
-        return map
-    }, [pagedRows])
-
-    const visibleColumns = useMemo(() => {
-        const selected = new Set(visibleColumnIds)
-        return COLUMN_DEFINITIONS.filter(column => selected.has(column.id))
-    }, [visibleColumnIds])
-
-    const summary = useMemo(() => {
-        const uniqueRosters = new Set(filteredRows.map(row => row.ROSTER)).size
-        const pageStart = (currentPage - 1) * rowsPerPage + 1
-        const pageEnd = Math.min(currentPage * rowsPerPage, filteredRows.length)
-
-        return {
-            totalRows: filteredRows.length,
-            uniqueRosters,
-            pageStart: filteredRows.length === 0 ? 0 : pageStart,
-            pageEnd,
-        }
-    }, [filteredRows, currentPage, rowsPerPage])
 
     return (
         <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
@@ -282,22 +149,22 @@ export const ConexionNetaOpe = () => {
                     )}
                 </div>
 
-                <div className='relative self-end sm:self-auto' ref={columnSelectorRef}>
+                <div className='relative self-end sm:self-auto' ref={columnSelector.containerRef}>
                     <button
                         type='button'
-                        onClick={() => setIsColumnSelectorOpen(open => !open)}
+                        onClick={() => columnSelector.setIsOpen(open => !open)}
                         aria-haspopup='menu'
-                        aria-expanded={isColumnSelectorOpen}
+                        aria-expanded={columnSelector.isOpen}
                         className={`${baseBtn} ${secondaryBtn}`}
                     >
                         <MdViewColumn size={18} />
                         Seleccionar columnas
                         <span className='ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600'>
-                            {visibleColumnIds.length}/{ALL_COLUMN_IDS.length}
+                            {columnSelector.visibleCount}/{columnSelector.totalCount}
                         </span>
                     </button>
 
-                    {isColumnSelectorOpen && (
+                    {columnSelector.isOpen && (
                         <div
                             role='menu'
                             className='absolute right-0 z-20 mt-2 w-80 origin-top-right rounded-xl border border-slate-200 bg-white shadow-xl'
@@ -309,14 +176,14 @@ export const ConexionNetaOpe = () => {
                                 <div className='flex gap-3 text-xs font-semibold'>
                                     <button
                                         type='button'
-                                        onClick={handleSelectAllColumns}
+                                        onClick={columnSelector.selectAll}
                                         className='text-orange-600 hover:text-orange-700'
                                     >
                                         Todas
                                     </button>
                                     <button
                                         type='button'
-                                        onClick={handleResetColumns}
+                                        onClick={columnSelector.reset}
                                         className='text-slate-500 hover:text-slate-700'
                                     >
                                         Por defecto
@@ -324,43 +191,40 @@ export const ConexionNetaOpe = () => {
                                 </div>
                             </div>
                             <ul className='max-h-80 overflow-y-auto py-1'>
-                                {COLUMN_DEFINITIONS.map(column => {
-                                    const checked = visibleColumnIds.includes(column.id)
-                                    const isOnlySelected =
-                                        checked && visibleColumnIds.length === 1
-                                    return (
-                                        <li key={column.id}>
-                                            <label
-                                                className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors hover:bg-slate-50 ${
-                                                    isOnlySelected
-                                                        ? 'cursor-not-allowed opacity-60'
-                                                        : 'cursor-pointer'
-                                                }`}
-                                                title={
-                                                    isOnlySelected
-                                                        ? 'Debe permanecer al menos una columna visible'
-                                                        : undefined
+                                {columnSelector.items.map(({ column, checked, isOnlySelected }) => (
+                                    <li key={column.id}>
+                                        <label
+                                            className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors hover:bg-slate-50 ${
+                                                isOnlySelected
+                                                    ? 'cursor-not-allowed opacity-60'
+                                                    : 'cursor-pointer'
+                                            }`}
+                                            title={
+                                                isOnlySelected
+                                                    ? 'Debe permanecer al menos una columna visible'
+                                                    : undefined
+                                            }
+                                        >
+                                            <input
+                                                type='checkbox'
+                                                checked={checked}
+                                                disabled={isOnlySelected}
+                                                onChange={e =>
+                                                    columnSelector.toggle(
+                                                        column.id,
+                                                        e.target.checked,
+                                                    )
                                                 }
-                                            >
-                                                <input
-                                                    type='checkbox'
-                                                    checked={checked}
-                                                    disabled={isOnlySelected}
-                                                    onChange={e =>
-                                                        toggleColumn(column.id, e.target.checked)
-                                                    }
-                                                    className='h-4 w-4 rounded border-slate-300 text-orange-500 focus:ring-orange-500'
-                                                />
-                                                <span className='text-slate-700'>
-                                                    {column.label}
-                                                </span>
-                                            </label>
-                                        </li>
-                                    )
-                                })}
+                                                className='h-4 w-4 rounded border-slate-300 text-orange-500 focus:ring-orange-500'
+                                            />
+                                            <span className='text-slate-700'>{column.label}</span>
+                                        </label>
+                                    </li>
+                                ))}
                             </ul>
                             <div className='border-t border-slate-200 bg-background-light px-4 py-2 text-xs text-slate-500'>
-                                {visibleColumnIds.length} de {ALL_COLUMN_IDS.length} seleccionadas
+                                {columnSelector.visibleCount} de {columnSelector.totalCount}{' '}
+                                seleccionadas
                             </div>
                         </div>
                     )}
@@ -424,7 +288,7 @@ export const ConexionNetaOpe = () => {
                                         {visibleColumns.map(column => {
                                             const colId = column.id as keyof DatumWild
 
-                                            if (GROUPED_COLUMN_IDS.has(colId)) {
+                                            if (isGroupedColumn(column.id)) {
                                                 const meta = groupMeta.get(colId)?.[rowIndex]
 
                                                 if (!meta?.render) return null
@@ -471,8 +335,10 @@ export const ConexionNetaOpe = () => {
                         <span className='font-semibold text-charcoal'>{summary.pageEnd}</span>
                         {' de '}
                         <span className='font-semibold text-charcoal'>{summary.totalRows}</span>
-                        {' registros \u00a0·\u00a0 '}
-                        <span className='font-semibold text-charcoal'>{summary.uniqueRosters}</span>
+                        {' registros  ·  '}
+                        <span className='font-semibold text-charcoal'>
+                            {summary.uniqueRosters}
+                        </span>
                         {' rosters'}
                     </p>
 
@@ -480,11 +346,7 @@ export const ConexionNetaOpe = () => {
                         Filas por página
                         <select
                             value={rowsPerPage}
-                            onChange={e =>
-                                setRowsPerPage(
-                                    Number(e.target.value) as (typeof PAGE_SIZE_OPTIONS)[number],
-                                )
-                            }
+                            onChange={e => setRowsPerPage(Number(e.target.value) as PageSize)}
                             className='rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm font-semibold text-charcoal focus:outline-none focus:ring-2 focus:ring-cyan'
                         >
                             {PAGE_SIZE_OPTIONS.map(size => (
