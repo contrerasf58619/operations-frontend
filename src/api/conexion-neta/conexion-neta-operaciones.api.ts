@@ -21,14 +21,16 @@ export interface ConexionNetaOpeParams extends Record<string, string | number | 
 export const conexionNetaOperacionesApi = {
     getConexionNeta(params: ConexionNetaOpeParams) {
         const route = baseURL(api, 'conexion-neta-operaciones', params)
-        return axios.get<{ status: number; data: DatumGT[] }>(route, {
+        return axios.get<{ status: number; data: DatumWild[] }>(route, {
             headers: getHeaders(),
+            timeout: 65000,
         })
     },
     getConexionNetaOpeGT(params: ConexionNetaOpeParams) {
         const route = baseURL(api, 'conexion-neta-operaciones/gt', params)
-        return axios.get<{ status: number; data: DatumWild[] }>(route, {
+        return axios.get<{ status: number; data: DatumGT[] }>(route, {
             headers: getHeaders(),
+            timeout: 65000,
         })
     },
 }
