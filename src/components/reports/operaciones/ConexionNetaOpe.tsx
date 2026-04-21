@@ -5,7 +5,7 @@ import { CustomTitle } from '@/components/UI/Custom/CustomTitle'
 import { CustomDatePicker } from '@/components/UI/DateTimePicker'
 import { useDateContext } from '@/context/UI/DateContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
-import type { ConexionNetaOpeDatum } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
+import type { DatumWild } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
 import { useEffect, useMemo, useState } from 'react'
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md'
@@ -17,7 +17,7 @@ const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
 
 const FALLBACK_COLUMN_IDS = ['ROSTER', 'NOMBRE', 'FECHA', 'HORARIO', 'CONEXION_NETA']
 
-const GROUPED_COLUMN_IDS = new Set<keyof ConexionNetaOpeDatum>([
+const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
     'WP_HOURS',
     'LAW_HOURS',
     'CALCULATED_LAW_HOURS',
@@ -26,10 +26,7 @@ const GROUPED_COLUMN_IDS = new Set<keyof ConexionNetaOpeDatum>([
 
 type CellMeta = { render: boolean; rowspan: number }
 
-function computeGroupMeta(
-    rows: ConexionNetaOpeDatum[],
-    columnId: keyof ConexionNetaOpeDatum,
-): CellMeta[] {
+function computeGroupMeta(rows: DatumWild[], columnId: keyof DatumWild): CellMeta[] {
     const meta: CellMeta[] = rows.map(() => ({ render: true, rowspan: 1 }))
 
     for (let i = rows.length - 1; i > 0; i--) {
@@ -49,7 +46,7 @@ function hasValue(value: unknown) {
     return value !== null && value !== undefined && String(value).trim() !== ''
 }
 
-function sortRowsByRoster(leftRow: ConexionNetaOpeDatum, rightRow: ConexionNetaOpeDatum) {
+function sortRowsByRoster(leftRow: DatumWild, rightRow: DatumWild) {
     return Number(leftRow.ROSTER) - Number(rightRow.ROSTER)
 }
 
@@ -125,7 +122,7 @@ export const ConexionNetaOpe = () => {
     }, [filteredRows, currentPage, rowsPerPage])
 
     const groupMeta = useMemo(() => {
-        const map = new Map<keyof ConexionNetaOpeDatum, CellMeta[]>()
+        const map = new Map<keyof DatumWild, CellMeta[]>()
         for (const colId of GROUPED_COLUMN_IDS) {
             map.set(colId, computeGroupMeta(pagedRows, colId))
         }
@@ -275,7 +272,7 @@ export const ConexionNetaOpe = () => {
                                         className='transition-colors hover:bg-background-light/60'
                                     >
                                         {visibleColumns.map(column => {
-                                            const colId = column.id as keyof ConexionNetaOpeDatum
+                                            const colId = column.id as keyof DatumWild
 
                                             if (GROUPED_COLUMN_IDS.has(colId)) {
                                                 const meta = groupMeta.get(colId)?.[rowIndex]
