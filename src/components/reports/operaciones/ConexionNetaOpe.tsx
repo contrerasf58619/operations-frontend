@@ -57,7 +57,7 @@ export const ConexionNetaOpe = () => {
     } = useTableConexionNeta(activeRows)
 
     useEffect(() => {
-        if (selectedUad === null) return
+        if (!selectedUad) return
 
         const params = {
             startDate: dateRange[0],
@@ -261,8 +261,8 @@ export const ConexionNetaOpe = () => {
                                         colSpan={visibleColumns.length}
                                         className='px-6 py-16 text-center text-sm text-slate-500'
                                     >
-                                        {selectedUad === null
-                                            ? 'Selecciona un UAD para consultar los datos.'
+                                        {!selectedUad
+                                            ? 'Cargando UADs...'
                                             : searchQuery
                                               ? `Sin resultados para "${searchQuery}".`
                                               : 'No se encontraron registros para los filtros seleccionados.'}
