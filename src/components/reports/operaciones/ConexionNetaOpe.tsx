@@ -8,13 +8,7 @@ import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type { DatumWild } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { GT_UAD_IDS } from '@/constants/uads'
 import { useEffect, useState } from 'react'
-import {
-    MdChevronLeft,
-    MdChevronRight,
-    MdClose,
-    MdSearch,
-    MdViewColumn,
-} from 'react-icons/md'
+import { MdChevronLeft, MdChevronRight, MdClose, MdSearch, MdViewColumn } from 'react-icons/md'
 import { TableSkeleton } from './TableSkeleton'
 import {
     PAGE_SIZE_OPTIONS,
@@ -141,9 +135,7 @@ export const ConexionNetaOpe = () => {
                                 {filteredRows.length}
                             </span>
                             {' de '}
-                            <span className='font-semibold text-charcoal'>
-                                {sortedRows.length}
-                            </span>
+                            <span className='font-semibold text-charcoal'>{sortedRows.length}</span>
                             {' resultados'}
                         </p>
                     )}
@@ -336,9 +328,7 @@ export const ConexionNetaOpe = () => {
                         {' de '}
                         <span className='font-semibold text-charcoal'>{summary.totalRows}</span>
                         {' registros  ·  '}
-                        <span className='font-semibold text-charcoal'>
-                            {summary.uniqueRosters}
-                        </span>
+                        <span className='font-semibold text-charcoal'>{summary.uniqueRosters}</span>
                         {' rosters'}
                     </p>
 
@@ -403,8 +393,8 @@ export const ConexionNetaOpe = () => {
                     </div>
                     <p className='text-sm text-slate-600 leading-relaxed'>
                         Usa el botón <span className='font-semibold'>Seleccionar columnas</span>{' '}
-                        para mostrar u ocultar columnas. Tu selección se guarda en el navegador y
-                        se mantiene en próximas visitas.
+                        para mostrar u ocultar columnas. Tu selección se guarda en el navegador y se
+                        mantiene en próximas visitas.
                     </p>
                 </div>
 
