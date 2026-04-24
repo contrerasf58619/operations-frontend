@@ -112,7 +112,7 @@ export function DataTable<TData>({
                                     {row.getVisibleCells().map(cell => (
                                         <td
                                             key={cell.id}
-                                            className='px-6 py-3 whitespace-nowrap text-sm text-gray-600 border-r last:border-r-0 border-gray-50'
+                                            className='px-6 py-3 break-word text-sm text-gray-600 border-r last:border-r-0 border-gray-50 '
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
