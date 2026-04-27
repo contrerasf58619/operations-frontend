@@ -614,7 +614,9 @@ export const inputFields = [
                 value: 'Not following communication standards',
             },
             { id: 6, label: 'Positive feedback', value: 'Positive feedback' },
-            { id: 7, label: 'Other', value: 'Other' },
+            { id: 7, label: 'Sales Integrity', value: 'Sales Integrity' },
+            { id: 8, label: 'Work avoidance', value: 'Work avoidance' },
+            { id: 9, label: 'Other', value: 'Other' },
         ],
     },
     {
