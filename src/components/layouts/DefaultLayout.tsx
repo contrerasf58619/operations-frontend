@@ -10,7 +10,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
                 </div>
                 <div className='w-full py-8 px-4 sm:px-6 lg:px-8 2xl:px-12 min-h-[85vh] flex'>
                     <SideBar />
-                    <div className='flex-grow'>{children}</div>
+                    <div className='flex-grow min-w-0'>{children}</div>
                 </div>
             </div>
         </div>

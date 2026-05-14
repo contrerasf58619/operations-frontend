@@ -15,6 +15,7 @@ import {
     useTableConexionNeta,
     type PageSize,
 } from '@/hooks/conexionNeta/useTableConexionNeta'
+import { useTableScrollNeeded } from '@/hooks/conexionNeta/useTableScrollNeeded'
 
 const baseBtn =
     'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1'
@@ -55,6 +56,8 @@ export const ConexionNetaOpe = () => {
         summary,
         columnSelector,
     } = useTableConexionNeta(activeRows)
+
+    const needsScroll = useTableScrollNeeded(visibleColumns.length)
 
     useEffect(() => {
         if (!selectedUad) return
@@ -223,15 +226,15 @@ export const ConexionNetaOpe = () => {
                 </div>
             </div>
 
-            <div className='w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
-                <div className='overflow-x-auto w-full'>
-                    <table className='w-full text-left border-collapse'>
+            <div className='w-full bg-white border border-slate-200 rounded-2xl shadow-brand'>
+                <div className={`w-full ${needsScroll ? 'overflow-x-auto' : 'overflow-hidden'}`}>
+                    <table className='min-w-full text-left border-collapse'>
                         <thead>
                             <tr className='border-b border-slate-200 bg-background-light'>
                                 {visibleColumns.map(column => (
                                     <th
                                         key={column.id}
-                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-xs font-semibold text-charcoal uppercase tracking-[0.18em] whitespace-nowrap ${
+                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-xs font-semibold text-charcoal uppercase tracking-[0.18em] whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
                                             column.headerClassName ?? ''
                                         }`}
                                     >
@@ -286,7 +289,7 @@ export const ConexionNetaOpe = () => {
                                                     <td
                                                         key={`${column.id}-${rowIndex}`}
                                                         rowSpan={meta.rowspan}
-                                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle ${
+                                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
                                                             column.cellClassName ?? ''
                                                         } ${
                                                             meta.rowspan > 1
@@ -301,7 +304,7 @@ export const ConexionNetaOpe = () => {
                                             return (
                                                 <td
                                                     key={`${column.id}-${rowIndex}`}
-                                                    className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle ${
+                                                    className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
                                                         column.cellClassName ?? ''
                                                     }`}
                                                 >
