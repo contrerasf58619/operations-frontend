@@ -1,10 +1,10 @@
 const skeletonRowsCount = 8
 
 function SkeletonCell({ index }: { index: number }) {
-    const widths = ['w-12', 'w-40', 'w-20', 'w-16', 'w-24', 'w-16', 'w-20']
+    const widths = ['w-2/3', 'w-4/5', 'w-1/2', 'w-3/5', 'w-3/4', 'w-1/2', 'w-2/3']
     const width = widths[index % widths.length]
     return (
-        <td className='px-6 py-4'>
+        <td className='px-3 py-2.5 xl:px-4 xl:py-3'>
             <div className={`h-3.5 rounded-full ${width} bg-slate-200 animate-pulse`} />
         </td>
     )

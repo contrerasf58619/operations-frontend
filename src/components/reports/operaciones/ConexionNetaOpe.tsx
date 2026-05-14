@@ -74,7 +74,7 @@ export const ConexionNetaOpe = () => {
     }, [dateRange, fetchConexionNeta, fetchConexionNetaGT, isGtUad, selectedUad])
 
     return (
-        <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+        <main className='w-full px-4 sm:px-6 lg:px-8 2xl:px-12 py-8'>
             <div className='flex flex-col gap-4 mb-8 lg:flex-row lg:items-center lg:justify-between'>
                 <div>
                     <CustomTitle text='Conexión Neta por Roster' size='text-2xl' />
@@ -223,15 +223,15 @@ export const ConexionNetaOpe = () => {
                 </div>
             </div>
 
-            <div className='bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
-                <div className='overflow-x-auto'>
-                    <table className='min-w-full text-left border-collapse'>
+            <div className='w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-brand'>
+                <div className='overflow-x-auto w-full'>
+                    <table className='w-full text-left border-collapse'>
                         <thead>
-                            <tr className='bg-background-light border-b border-slate-200'>
+                            <tr className='border-b border-slate-200 bg-background-light'>
                                 {visibleColumns.map(column => (
                                     <th
                                         key={column.id}
-                                        className={`px-6 py-4 text-xs font-semibold text-charcoal uppercase tracking-[0.18em] whitespace-nowrap ${
+                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-xs font-semibold text-charcoal uppercase tracking-[0.18em] whitespace-nowrap ${
                                             column.headerClassName ?? ''
                                         }`}
                                     >
@@ -248,9 +248,9 @@ export const ConexionNetaOpe = () => {
                                 <tr>
                                     <td
                                         colSpan={visibleColumns.length}
-                                        className='px-6 py-16 text-center text-sm text-orange'
+                                        className='px-6 py-16 text-center text-sm text-red-500'
                                     >
-                                        {error}
+                                        Error cargando datos. Por favor intenta de nuevo.
                                     </td>
                                 </tr>
                             )}
@@ -279,17 +279,14 @@ export const ConexionNetaOpe = () => {
                                     >
                                         {visibleColumns.map(column => {
                                             const colId = column.id as keyof DatumWild
-
                                             if (isGroupedColumn(column.id)) {
                                                 const meta = groupMeta.get(colId)?.[rowIndex]
-
                                                 if (!meta?.render) return null
-
                                                 return (
                                                     <td
                                                         key={`${column.id}-${rowIndex}`}
                                                         rowSpan={meta.rowspan}
-                                                        className={`px-6 py-4 text-sm text-slate-600 align-middle ${
+                                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle ${
                                                             column.cellClassName ?? ''
                                                         } ${
                                                             meta.rowspan > 1
@@ -301,11 +298,10 @@ export const ConexionNetaOpe = () => {
                                                     </td>
                                                 )
                                             }
-
                                             return (
                                                 <td
                                                     key={`${column.id}-${rowIndex}`}
-                                                    className={`px-6 py-4 text-sm text-slate-600 align-middle ${
+                                                    className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle ${
                                                         column.cellClassName ?? ''
                                                     }`}
                                                 >
