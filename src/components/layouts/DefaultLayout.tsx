@@ -8,9 +8,9 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
                 <div className='border-2 w-full border-gray-100'>
                     <TopBar />
                 </div>
-                <div className='lg:w-[90%] py-8 mx-auto min-h-[85vh] flex'>
+                <div className='w-full py-8 px-4 sm:px-6 lg:px-8 2xl:px-12 min-h-[85vh] flex'>
                     <SideBar />
-                    <div className='flex-grow'>{children}</div>
+                    <div className='flex-grow min-w-0'>{children}</div>
                 </div>
             </div>
         </div>
