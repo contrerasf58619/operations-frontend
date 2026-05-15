@@ -37,6 +37,7 @@ export interface DatumGT {
     HORAS_JORNADA_SEG: string
     HORAS_DESCUENTO_SEG: string
     SEPTIMO_PROPORCIONAL: string
+    PORCENTAJE_CONEXION: string
 }
 
 export enum Asistencia {
@@ -105,4 +106,5 @@ export interface DatumWild {
     HORAS_JORNADA_SEG: string
     HORAS_DESCUENTO_SEG: string
     SEPTIMO_PROPORCIONAL: string
+    PORCENTAJE_CONEXION: string
 }
