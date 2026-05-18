@@ -253,7 +253,7 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
         id: 'SEPTIMO_PROPORCIONAL',
         label: 'Septimo Proporcional',
         sourceKeys: ['SEPTIMO_PROPORCIONAL'],
-        render: row => (hasValue(row.SEPTIMO_PROPORCIONAL) ? `${row.SEPTIMO_PROPORCIONAL}%` : '--'),
+        render: row => formatValue(row.SEPTIMO_PROPORCIONAL),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {
