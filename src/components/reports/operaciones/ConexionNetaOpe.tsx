@@ -299,7 +299,9 @@ export const ConexionNetaOpe = () => {
                                                         }`}
                                                         style={
                                                             meta.rowspan > 1
-                                                                ? { fontSize: `${MERGED_CELL_FONT_SIZE_PX}px` }
+                                                                ? {
+                                                                      fontSize: `${MERGED_CELL_FONT_SIZE_PX}px`,
+                                                                  }
                                                                 : undefined
                                                         }
                                                     >
