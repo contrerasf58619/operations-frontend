@@ -21,9 +21,9 @@ export const FALLBACK_COLUMN_IDS: string[] = [
     'NOMBRE',
     'FECHA',
     'HORARIO',
-    'NOMENCLATURA',
-    'FINAL',
-    'PORCENTAJE_CONEXION',
+    // 'NOMENCLATURA',
+    // 'FINAL',
+    // 'PORCENTAJE_CONEXION',
 ]
 
 export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
@@ -33,6 +33,8 @@ export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
     'HORAS_EXTRA_SEG',
     'SEPTIMO_PROPORCIONAL',
     'PORCENTAJE_CONEXION',
+    'HORAS_DESCUENTO_SEG',
+    'HORAS_JORNADA_SEG',
 ])
 
 const ALL_COLUMN_IDS: string[] = COLUMN_DEFINITIONS.map(column => column.id)
