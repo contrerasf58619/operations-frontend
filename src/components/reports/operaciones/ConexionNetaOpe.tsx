@@ -10,6 +10,7 @@ import { GT_UAD_IDS } from '@/constants/uads'
 import { useEffect, useState } from 'react'
 import { MdChevronLeft, MdChevronRight, MdClose, MdSearch, MdViewColumn } from 'react-icons/md'
 import { TableSkeleton } from './TableSkeleton'
+import { MERGED_CELL_FONT_SIZE_PX } from './utils/columns-cno'
 import {
     PAGE_SIZE_OPTIONS,
     useTableConexionNeta,
@@ -289,13 +290,20 @@ export const ConexionNetaOpe = () => {
                                                     <td
                                                         key={`${column.id}-${rowIndex}`}
                                                         rowSpan={meta.rowspan}
-                                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
+                                                        className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 text-center align-middle whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
                                                             column.cellClassName ?? ''
                                                         } ${
                                                             meta.rowspan > 1
                                                                 ? 'border-l border-r border-slate-100 bg-slate-50/40'
                                                                 : ''
                                                         }`}
+                                                        style={
+                                                            meta.rowspan > 1
+                                                                ? {
+                                                                      fontSize: `${MERGED_CELL_FONT_SIZE_PX}px`,
+                                                                  }
+                                                                : undefined
+                                                        }
                                                     >
                                                         {column.render(row)}
                                                     </td>
@@ -304,7 +312,7 @@ export const ConexionNetaOpe = () => {
                                             return (
                                                 <td
                                                     key={`${column.id}-${rowIndex}`}
-                                                    className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 align-middle whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
+                                                    className={`px-3 py-2.5 xl:px-4 xl:py-3 text-sm text-slate-600 text-center align-middle whitespace-nowrap min-w-[90px] lg:min-w-[110px] xl:min-w-[130px] ${
                                                         column.cellClassName ?? ''
                                                     }`}
                                                 >
