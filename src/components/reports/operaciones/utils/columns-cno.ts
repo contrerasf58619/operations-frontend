@@ -256,4 +256,11 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
         render: row => (hasValue(row.SEPTIMO_PROPORCIONAL) ? `${row.SEPTIMO_PROPORCIONAL}%` : '--'),
         cellClassName: 'font-mono whitespace-nowrap',
     },
+    {
+        id: 'PORCENTAJE_CONEXION',
+        label: 'Porcentaje Conexión',
+        sourceKeys: ['PORCENTAJE_CONEXION'],
+        render: row => (hasValue(row.PORCENTAJE_CONEXION) ? `${row.PORCENTAJE_CONEXION}%` : '--'),
+        cellClassName: 'font-mono whitespace-nowrap',
+    },
 ]

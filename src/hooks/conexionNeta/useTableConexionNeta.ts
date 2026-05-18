@@ -23,6 +23,7 @@ export const FALLBACK_COLUMN_IDS: string[] = [
     'HORARIO',
     'NOMENCLATURA',
     'FINAL',
+    'PORCENTAJE_CONEXION',
 ]
 
 export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
@@ -31,6 +32,7 @@ export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
     'CALCULATED_LAW_HOURS',
     'HORAS_EXTRA_SEG',
     'SEPTIMO_PROPORCIONAL',
+    'PORCENTAJE_CONEXION',
 ])
 
 const ALL_COLUMN_IDS: string[] = COLUMN_DEFINITIONS.map(column => column.id)
