@@ -25,6 +25,8 @@ export function FilterDropdown({
     maxFilters,
 }: FilterDropdownProps) {
     const panelRef = useRef<HTMLDivElement | null>(null)
+    const searchInputRef = useRef<HTMLInputElement | null>(null)
+    const textInputRef = useRef<HTMLInputElement | null>(null)
     const [query, setQuery] = useState('')
     const [textDraft, setTextDraft] = useState('')
 
@@ -41,6 +43,14 @@ export function FilterDropdown({
 
     useEffect(() => {
         setTextDraft('')
+    }, [activeFieldKey])
+
+    useEffect(() => {
+        if (activeFieldKey === null) {
+            searchInputRef.current?.focus()
+        } else {
+            textInputRef.current?.focus()
+        }
     }, [activeFieldKey])
 
     const activeField = useMemo(
@@ -134,8 +144,8 @@ export function FilterDropdown({
                         <span>{activeField.label}</span>
                     </div>
                     <input
+                        ref={textInputRef}
                         type='text'
-                        autoFocus
                         value={textDraft}
                         onChange={e => setTextDraft(e.target.value)}
                         onKeyDown={e => {
@@ -198,8 +208,8 @@ export function FilterDropdown({
                             aria-hidden
                         />
                         <input
+                            ref={searchInputRef}
                             type='text'
-                            autoFocus
                             value={query}
                             onChange={e => setQuery(e.target.value)}
                             placeholder='Filter…'
