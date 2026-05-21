@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useLayoutEffect } from 'react'
 import { LuCheck, LuSearch } from 'react-icons/lu'
 import type { FilterFieldConfig } from './filters.types'
 
@@ -10,6 +10,24 @@ interface FilterSubPanelProps {
 
 export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPanelProps) {
     const [query, setQuery] = useState('')
+    const panelRef = useRef<HTMLDivElement>(null)
+    const [alignLeft, setAlignLeft] = useState(false)
+
+    useLayoutEffect(() => {
+        const checkBounds = () => {
+            if (!panelRef.current) return
+            const rect = panelRef.current.getBoundingClientRect()
+
+            // If the panel extends past the right edge of the viewport (with a 10px buffer), flip it to the left
+            if (!alignLeft && rect.right > window.innerWidth - 10) {
+                setAlignLeft(true)
+            }
+        }
+
+        checkBounds()
+        window.addEventListener('resize', checkBounds)
+        return () => window.removeEventListener('resize', checkBounds)
+    }, [alignLeft])
 
     const filtered = useMemo(() => {
         const options = field.options ?? []
@@ -20,13 +38,16 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
 
     return (
         <div
-            className='absolute left-full top-0 ml-1 w-64 rounded-md border border-white/10 bg-charcoal p-1.5 shadow-2xl shadow-black/50'
+            ref={panelRef}
+            className={`absolute top-0 w-64 rounded-md border border-gray-200 bg-white p-1.5 shadow-xl ${
+                alignLeft ? 'right-full mr-1' : 'left-full ml-1'
+            }`}
             role='dialog'
             aria-label={`${field.label} options`}
         >
             <div className='relative mb-1.5'>
                 <LuSearch
-                    className='pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-white/40'
+                    className='pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-gray-400'
                     aria-hidden
                 />
                 <input
@@ -35,7 +56,7 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     placeholder={`Search ${field.label.toLowerCase()}…`}
-                    className='w-full rounded bg-graphite py-1.5 pl-7 pr-2 text-xs text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal'
+                    className='w-full rounded border border-gray-200 bg-gray-50 py-1.5 pl-7 pr-2 text-xs text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
                 />
             </div>
 
@@ -45,7 +66,7 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
                 className='max-h-64 space-y-0.5 overflow-y-auto pr-0.5'
             >
                 {filtered.length === 0 && (
-                    <li className='px-2 py-2 text-center text-xs text-white/40'>No results</li>
+                    <li className='px-2 py-2 text-center text-xs text-gray-400'>No results</li>
                 )}
                 {filtered.map(option => {
                     const selected = selectedValues.includes(option.value)
@@ -54,13 +75,13 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
                             <button
                                 type='button'
                                 onClick={() => onToggle(option.value)}
-                                className='flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs text-white/90 transition-colors hover:bg-graphite focus:outline-none focus-visible:ring-2 focus-visible:ring-teal'
+                                className='flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
                             >
                                 <span
                                     className={`flex size-4 shrink-0 items-center justify-center rounded border transition-colors ${
                                         selected
-                                            ? 'border-cyan bg-cyan text-charcoal'
-                                            : 'border-white/30 bg-transparent'
+                                            ? 'border-blue-600 bg-blue-600 text-white'
+                                            : 'border-gray-300 bg-white'
                                     }`}
                                     aria-hidden
                                 >
@@ -73,7 +94,7 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
                                         className='size-4 shrink-0 rounded-full object-cover'
                                     />
                                 ) : option.icon ? (
-                                    <span className='flex size-4 shrink-0 items-center justify-center text-white/70'>
+                                    <span className='flex size-4 shrink-0 items-center justify-center text-gray-400'>
                                         {option.icon}
                                     </span>
                                 ) : null}

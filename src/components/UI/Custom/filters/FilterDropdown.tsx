@@ -122,13 +122,13 @@ export function FilterDropdown({
             ref={panelRef}
             role='dialog'
             aria-label='Filter options'
-            className='absolute left-0 top-full z-50 mt-1 w-56 rounded-md border border-white/10 bg-charcoal p-1.5 shadow-2xl shadow-black/50'
+            className='absolute left-0 top-full z-50 mt-1 w-56 rounded-md border border-gray-200 bg-white p-1.5 shadow-xl'
         >
             {/* Inline text input for `text` fields */}
             {activeField && activeField.type === 'text' ? (
                 <div className='space-y-1.5'>
-                    <div className='flex items-center gap-1.5 px-1 py-0.5 text-xs text-white/60'>
-                        <span className='flex size-4 items-center justify-center text-white/70'>
+                    <div className='flex items-center gap-1.5 px-1 py-0.5 text-xs text-gray-500'>
+                        <span className='flex size-4 items-center justify-center text-gray-400'>
                             {activeField.icon}
                         </span>
                         <span>{activeField.label}</span>
@@ -149,7 +149,7 @@ export function FilterDropdown({
                             }
                         }}
                         placeholder={activeField.placeholder ?? 'Type a value…'}
-                        className={`w-full rounded bg-graphite px-2 py-1.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal ${
+                        className={`w-full rounded border border-gray-200 bg-gray-50 px-2 py-1.5 text-xs text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
                             activeField.className ?? ''
                         }`}
                     />
@@ -157,7 +157,7 @@ export function FilterDropdown({
                         type='button'
                         onClick={() => commitTextFilter(activeField, textDraft)}
                         disabled={!textDraft.trim()}
-                        className='w-full rounded bg-teal px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-cyan disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal'
+                        className='w-full rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
                     >
                         Apply
                     </button>
@@ -172,12 +172,14 @@ export function FilterDropdown({
                                 <button
                                     type='button'
                                     onClick={() => setSingleValue(activeField, option.value)}
-                                    className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors hover:bg-graphite focus:outline-none focus-visible:ring-2 focus-visible:ring-teal ${
-                                        selected ? 'text-cyan' : 'text-white/90'
+                                    className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                                        selected
+                                            ? 'bg-blue-50 font-medium text-blue-600'
+                                            : 'text-gray-700'
                                     }`}
                                 >
                                     {option.icon && (
-                                        <span className='flex size-4 items-center justify-center text-white/70'>
+                                        <span className='flex size-4 items-center justify-center text-gray-400'>
                                             {option.icon}
                                         </span>
                                     )}
@@ -192,7 +194,7 @@ export function FilterDropdown({
                     {/* Field search */}
                     <div className='relative mb-1.5'>
                         <LuSearch
-                            className='pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-white/40'
+                            className='pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-gray-400'
                             aria-hidden
                         />
                         <input
@@ -201,14 +203,14 @@ export function FilterDropdown({
                             value={query}
                             onChange={e => setQuery(e.target.value)}
                             placeholder='Filter…'
-                            className='w-full rounded bg-graphite py-1.5 pl-7 pr-2 text-xs text-white placeholder:text-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal'
+                            className='w-full rounded border border-gray-200 bg-gray-50 py-1.5 pl-7 pr-2 text-xs text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
                         />
                     </div>
 
                     {/* Field list */}
                     <ul className='space-y-0.5' role='menu'>
                         {filteredFields.length === 0 && (
-                            <li className='px-2 py-2 text-center text-xs text-white/40'>
+                            <li className='px-2 py-2 text-center text-xs text-gray-400'>
                                 No fields
                             </li>
                         )}
@@ -225,7 +227,9 @@ export function FilterDropdown({
                     </ul>
 
                     {limitReached && (
-                        <p className='mt-1.5 px-2 text-[10px] text-amber'>Filter limit reached</p>
+                        <p className='mt-1.5 px-2 text-[10px] text-amber-600'>
+                            Filter limit reached
+                        </p>
                     )}
                 </>
             )}

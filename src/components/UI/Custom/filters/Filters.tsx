@@ -48,7 +48,7 @@ export function Filters({ fields, filters, onChange, trigger, maxFilters }: Filt
                         aria-haspopup='listbox'
                         aria-expanded={open}
                         aria-label='Open filter menu'
-                        className='flex size-8 items-center justify-center rounded-md border border-white/10 bg-charcoal text-white/80 transition-colors hover:bg-graphite hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-teal'
+                        className='flex size-8 items-center justify-center rounded-md bg-gray-900 text-white transition-colors hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
                     >
                         <LuListFilter className='size-4' aria-hidden />
                     </button>
