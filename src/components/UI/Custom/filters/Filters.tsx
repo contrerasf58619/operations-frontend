@@ -35,7 +35,25 @@ export function Filters({ fields, filters, onChange, trigger, maxFilters }: Filt
     }
 
     return (
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-wrap items-center gap-2'>
+            {/* Pills will now render horizontally right next to the trigger button */}
+            {filters.length > 0 && (
+                <div className='flex flex-wrap items-center gap-2'>
+                    {filters.map(filter => {
+                        const field = getFieldConfig(fields, filter.key)
+                        if (!field) return null
+                        return (
+                            <FilterPill
+                                key={filter.id}
+                                filter={filter}
+                                field={field}
+                                onRemove={handleRemove}
+                            />
+                        )
+                    })}
+                </div>
+            )}
+
             <div className='relative inline-flex'>
                 {trigger ? (
                     <span onClick={handleOpen} className='cursor-pointer'>
@@ -48,7 +66,7 @@ export function Filters({ fields, filters, onChange, trigger, maxFilters }: Filt
                         aria-haspopup='listbox'
                         aria-expanded={open}
                         aria-label='Open filter menu'
-                        className='flex size-8 items-center justify-center rounded-md bg-gray-900 text-white transition-colors hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+                        className='flex size-9 items-center justify-center rounded-md bg-slate-900 text-white transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 shadow-sm'
                     >
                         <LuListFilter className='size-4' aria-hidden />
                     </button>
@@ -66,23 +84,6 @@ export function Filters({ fields, filters, onChange, trigger, maxFilters }: Filt
                     />
                 )}
             </div>
-
-            {filters.length > 0 && (
-                <div className='flex flex-wrap items-center gap-1.5'>
-                    {filters.map(filter => {
-                        const field = getFieldConfig(fields, filter.key)
-                        if (!field) return null
-                        return (
-                            <FilterPill
-                                key={filter.id}
-                                filter={filter}
-                                field={field}
-                                onRemove={handleRemove}
-                            />
-                        )
-                    })}
-                </div>
-            )}
         </div>
     )
 }

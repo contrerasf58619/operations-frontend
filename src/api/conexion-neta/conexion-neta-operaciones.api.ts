@@ -36,7 +36,7 @@ export const conexionNetaOperacionesApi = {
     },
 
     findSupervisors(params: ConexionNetaOpeParams) {
-        const route = baseURL(api, 'supervisors', params)
+        const route = baseURL(api, 'conexion-neta-operaciones/find-supervisor', params)
         return axios.get<{ status: number; data: DatumSupervisorsResponse[] }>(route, {
             headers: getHeaders(),
             timeout: 65000,
