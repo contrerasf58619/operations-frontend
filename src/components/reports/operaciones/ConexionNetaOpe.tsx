@@ -3,12 +3,22 @@
 import { UadList } from '@/components/catalogs/UadList'
 import { CustomTitle } from '@/components/UI/Custom/CustomTitle'
 import { CustomDatePicker } from '@/components/UI/DateTimePicker'
+import { Filters } from '@/components/UI/Custom/filters/Filters'
+import type {
+    Filter,
+    FilterFieldConfig,
+} from '@/components/UI/Custom/filters/filters.types'
 import { useDateContext } from '@/context/UI/DateContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
-import type { DatumWild } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
+import type {
+    DatumSupervisorsResponse,
+    DatumWild,
+} from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
+import { conexionNetaOperacionesApi } from '@/api/conexion-neta/conexion-neta-operaciones.api'
 import { GT_UAD_IDS } from '@/constants/uads'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MdChevronLeft, MdChevronRight, MdClose, MdSearch, MdViewColumn } from 'react-icons/md'
+import { LuUser } from 'react-icons/lu'
 import { TableSkeleton } from './TableSkeleton'
 import { MERGED_CELL_FONT_SIZE_PX } from './utils/columns-cno'
 import {
@@ -35,10 +45,57 @@ export const ConexionNetaOpe = () => {
     const { data, dataGT, loading, loadingGT, error, fetchConexionNeta, fetchConexionNetaGT } =
         useConexionNetaOpe()
     const [selectedUad, setSelectedUad] = useState<number>(0)
+    const [supervisors, setSupervisors] = useState<DatumSupervisorsResponse[]>([])
+    const [filters, setFilters] = useState<Filter[]>([])
     const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
 
     const activeRows: DatumWild[] = isGtUad ? dataGT : data
     const activeLoading = isGtUad ? loadingGT : loading
+
+    // Map `sup_code` → `full_name` so we can resolve filter values back to a
+    // human label when matching against the row's `POSICION SUP` column.
+    const supervisorByCode = useMemo(
+        () => new Map(supervisors.map(s => [String(s.sup_code), s.full_name])),
+        [supervisors],
+    )
+
+    const filterFields: FilterFieldConfig[] = useMemo(
+        () => [
+            {
+                key: 'supervisor',
+                label: 'Supervisor',
+                icon: <LuUser className='size-3.5' />,
+                type: 'select-multi',
+                options: supervisors.map(s => ({
+                    value: String(s.sup_code),
+                    label: s.full_name,
+                })),
+            },
+        ],
+        [supervisors],
+    )
+
+    // Apply user-selected filters BEFORE the table hook so pagination, the
+    // grouped-cell rowspans and the summary all respect the active filter set.
+    const filteredActiveRows = useMemo(() => {
+        if (filters.length === 0) return activeRows
+        const supervisorFilter = filters.find(f => f.key === 'supervisor')
+        if (!supervisorFilter || supervisorFilter.values.length === 0) return activeRows
+
+        const targetNames = new Set(
+            supervisorFilter.values
+                .map(code => supervisorByCode.get(code)?.trim().toLowerCase())
+                .filter((name): name is string => Boolean(name)),
+        )
+        if (targetNames.size === 0) return activeRows
+
+        return activeRows.filter(row => {
+            const name = String(row.SUP_NAME ?? '')
+                .trim()
+                .toLowerCase()
+            return name !== '' && targetNames.has(name)
+        })
+    }, [activeRows, filters, supervisorByCode])
 
     const {
         searchQuery,
@@ -56,7 +113,7 @@ export const ConexionNetaOpe = () => {
         isGroupedColumn,
         summary,
         columnSelector,
-    } = useTableConexionNeta(activeRows)
+    } = useTableConexionNeta(filteredActiveRows)
 
     const needsScroll = useTableScrollNeeded(visibleColumns.length)
 
@@ -76,6 +133,38 @@ export const ConexionNetaOpe = () => {
 
         void fetchConexionNeta(params)
     }, [dateRange, fetchConexionNeta, fetchConexionNetaGT, isGtUad, selectedUad])
+
+    useEffect(() => {
+        setFilters([])
+
+        if (!selectedUad) {
+            setSupervisors([])
+            return
+        }
+
+        let cancelled = false
+        const params = {
+            startDate: dateRange[0],
+            endDate: dateRange[1],
+            uadId: selectedUad,
+        }
+
+        conexionNetaOperacionesApi
+            .findSupervisors(params)
+            .then(res => {
+                if (cancelled) return
+                setSupervisors(res.data.data ?? [])
+            })
+            .catch(err => {
+                if (cancelled) return
+                console.error('[ConexionNetaOpe] findSupervisors failed', err)
+                setSupervisors([])
+            })
+
+        return () => {
+            cancelled = true
+        }
+    }, [dateRange, selectedUad])
 
     return (
         <main className='w-full px-4 sm:px-6 lg:px-8 2xl:px-12 py-8'>
@@ -145,6 +234,14 @@ export const ConexionNetaOpe = () => {
                     )}
                 </div>
 
+                <div className='flex items-center gap-2 self-end sm:self-auto'>
+                    <Filters
+                        fields={filterFields}
+                        filters={filters}
+                        onChange={setFilters}
+                    />
+                </div>
+
                 <div className='relative self-end sm:self-auto' ref={columnSelector.containerRef}>
                     <button
                         type='button'
@@ -159,7 +256,6 @@ export const ConexionNetaOpe = () => {
                             {columnSelector.visibleCount}/{columnSelector.totalCount}
                         </span>
                     </button>
-
                     {columnSelector.isOpen && (
                         <div
                             role='menu'
