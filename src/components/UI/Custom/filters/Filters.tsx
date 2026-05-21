@@ -56,9 +56,15 @@ export function Filters({ fields, filters, onChange, trigger, maxFilters }: Filt
 
             <div className='relative inline-flex'>
                 {trigger ? (
-                    <span onClick={handleOpen} className='cursor-pointer'>
+                    <button
+                        type='button'
+                        onClick={handleOpen}
+                        aria-haspopup='listbox'
+                        aria-expanded={open}
+                        className='cursor-pointer bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+                    >
                         {trigger}
-                    </span>
+                    </button>
                 ) : (
                     <button
                         type='button'

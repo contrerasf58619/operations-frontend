@@ -1,19 +1,9 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/nextjs'
-import {
-    LuUser,
-    LuFlag,
-    LuTag,
-    LuMail,
-    LuBuilding2,
-    LuCircleDot,
-} from 'react-icons/lu'
+import { LuUser, LuFlag, LuTag, LuMail, LuBuilding2, LuCircleDot } from 'react-icons/lu'
 
 import { Filters } from '../components/UI/Custom/filters/Filters'
-import type {
-    Filter,
-    FilterFieldConfig,
-} from '../components/UI/Custom/filters/filters.types'
+import type { Filter, FilterFieldConfig } from '../components/UI/Custom/filters/filters.types'
 import { createFilter } from '../components/UI/Custom/filters/filters.utils'
 
 // --- Sample data ---

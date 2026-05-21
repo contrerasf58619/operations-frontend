@@ -4,10 +4,7 @@ import { UadList } from '@/components/catalogs/UadList'
 import { CustomTitle } from '@/components/UI/Custom/CustomTitle'
 import { CustomDatePicker } from '@/components/UI/DateTimePicker'
 import { Filters } from '@/components/UI/Custom/filters/Filters'
-import type {
-    Filter,
-    FilterFieldConfig,
-} from '@/components/UI/Custom/filters/filters.types'
+import type { Filter, FilterFieldConfig } from '@/components/UI/Custom/filters/filters.types'
 import { useDateContext } from '@/context/UI/DateContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type {
@@ -235,11 +232,7 @@ export const ConexionNetaOpe = () => {
                 </div>
 
                 <div className='flex items-center gap-2 self-end sm:self-auto'>
-                    <Filters
-                        fields={filterFields}
-                        filters={filters}
-                        onChange={setFilters}
-                    />
+                    <Filters fields={filterFields} filters={filters} onChange={setFilters} />
                 </div>
 
                 <div className='relative self-end sm:self-auto' ref={columnSelector.containerRef}>

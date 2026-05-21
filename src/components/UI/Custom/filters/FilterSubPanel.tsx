@@ -1,4 +1,5 @@
-import { useMemo, useState, useRef, useLayoutEffect } from 'react'
+import { useEffect, useMemo, useState, useRef, useLayoutEffect } from 'react'
+import Image from 'next/image'
 import { LuCheck, LuSearch } from 'react-icons/lu'
 import type { FilterFieldConfig } from './filters.types'
 
@@ -11,7 +12,12 @@ interface FilterSubPanelProps {
 export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPanelProps) {
     const [query, setQuery] = useState('')
     const panelRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
     const [alignLeft, setAlignLeft] = useState(false)
+
+    useEffect(() => {
+        inputRef.current?.focus()
+    }, [])
 
     useLayoutEffect(() => {
         const checkBounds = () => {
@@ -51,8 +57,8 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
                     aria-hidden
                 />
                 <input
+                    ref={inputRef}
                     type='text'
-                    autoFocus
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     placeholder={`Search ${field.label.toLowerCase()}…`}
@@ -88,9 +94,11 @@ export function FilterSubPanel({ field, selectedValues, onToggle }: FilterSubPan
                                     {selected && <LuCheck className='size-3' strokeWidth={3} />}
                                 </span>
                                 {option.avatar ? (
-                                    <img
+                                    <Image
                                         src={option.avatar}
                                         alt=''
+                                        width={16}
+                                        height={16}
                                         className='size-4 shrink-0 rounded-full object-cover'
                                     />
                                 ) : option.icon ? (
