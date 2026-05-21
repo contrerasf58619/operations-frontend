@@ -3,6 +3,17 @@ export interface ConexionNetaOpeDataResponseAPIGT {
     data: DatumGT[]
 }
 
+export interface SupervisorsResponse {
+    status: number
+    data: DatumSupervisorsResponse[]
+}
+
+export interface DatumSupervisorsResponse {
+    sup_code: number
+    full_name: string
+    position_name: string
+}
+
 export interface DatumGT {
     ROSTER: number
     NOMBRE: string
@@ -12,6 +23,7 @@ export interface DatumGT {
     PLANNED: string
     'POSICION AGENTE': string
     'POSICION SUP': string
+    SUP_NAME: string
     WP_HOURS: string
     LAW_HOURS: string
     CALCULATED_LAW_HOURS: string
@@ -29,6 +41,7 @@ export interface DatumGT {
     FINAL: Asistencia
     CONEXION_NETA: string
     CONEXION_NETA_CALCULADA: string
+    CONEXION_NETA_CALCULADA_WEEKLY: string
     CONEXION_AMD: string
     CONEXION_DMD: string
     DIFERENCIA: string
@@ -81,6 +94,7 @@ export interface DatumWild {
     PLANNED: string
     'POSICION AGENTE': string
     'POSICION SUP': string
+    SUP_NAME: string
     WP_HOURS: string
     LAW_HOURS: string
     CALCULATED_LAW_HOURS: string
@@ -98,6 +112,7 @@ export interface DatumWild {
     FINAL: Asistencia
     CONEXION_NETA: string
     CONEXION_NETA_CALCULADA: string
+    CONEXION_NETA_CALCULADA_WEEKLY: string
     CONEXION_AMD: string
     CONEXION_DMD: string
     DIFERENCIA: string
