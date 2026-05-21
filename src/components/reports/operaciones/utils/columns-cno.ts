@@ -29,7 +29,7 @@ function formatValue(value: unknown) {
 export const COLUMN_DEFINITIONS: TableColumn[] = [
     {
         id: 'ROSTER',
-        label: 'Roster',
+        label: 'ID Empleado',
         sourceKeys: ['ROSTER'],
         render: row => row.ROSTER,
         cellClassName: 'font-semibold text-charcoal whitespace-nowrap',
@@ -80,6 +80,13 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
         label: 'Posicion Sup',
         sourceKeys: ['POSICION SUP'],
         render: row => formatValue(row['POSICION SUP']),
+    },
+    {
+        id: 'SUP_NAME',
+        label: 'SUP',
+        sourceKeys: ['SUP_NAME'],
+        render: row => row.SUP_NAME,
+        cellClassName: 'min-w-[220px]',
     },
     {
         id: 'WP_HOURS',
@@ -198,6 +205,13 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
         label: 'Conexión Neta Calc',
         sourceKeys: ['CONEXION_NETA_CALCULADA'],
         render: row => formatValue(row.CONEXION_NETA_CALCULADA),
+        cellClassName: 'font-mono whitespace-nowrap',
+    },
+    {
+        id: 'CONEXION_NETA_CALCULADA_WEEKLY',
+        label: 'Conexión Calc Weekly',
+        sourceKeys: ['CONEXION_NETA_CALCULADA_WEEKLY'],
+        render: row => formatValue(row.CONEXION_NETA_CALCULADA_WEEKLY),
         cellClassName: 'font-mono whitespace-nowrap',
     },
     {

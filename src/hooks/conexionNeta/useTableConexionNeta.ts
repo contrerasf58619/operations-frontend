@@ -35,6 +35,7 @@ export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
     'PORCENTAJE_CONEXION',
     'HORAS_DESCUENTO_SEG',
     'HORAS_JORNADA_SEG',
+    'CONEXION_NETA_CALCULADA_WEEKLY',
 ])
 
 const ALL_COLUMN_IDS: string[] = COLUMN_DEFINITIONS.map(column => column.id)

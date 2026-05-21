@@ -4,6 +4,7 @@ import { baseURL } from '../baseURL'
 import {
     DatumWild,
     DatumGT,
+    DatumSupervisorsResponse,
 } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 
 const api = process.env.NEXT_PUBLIC_URL_UAD_NEST
@@ -29,6 +30,14 @@ export const conexionNetaOperacionesApi = {
     getConexionNetaOpeGT(params: ConexionNetaOpeParams) {
         const route = baseURL(api, 'conexion-neta-operaciones/gt', params)
         return axios.get<{ status: number; data: DatumGT[] }>(route, {
+            headers: getHeaders(),
+            timeout: 65000,
+        })
+    },
+
+    findSupervisors(params: ConexionNetaOpeParams) {
+        const route = baseURL(api, 'supervisors', params)
+        return axios.get<{ status: number; data: DatumSupervisorsResponse[] }>(route, {
             headers: getHeaders(),
             timeout: 65000,
         })
