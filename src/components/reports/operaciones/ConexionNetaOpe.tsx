@@ -8,16 +8,18 @@ import type { Filter, FilterFieldConfig } from '@/components/UI/Custom/filters/f
 import { useDateContext } from '@/context/UI/DateContext'
 import { useConexionNetaOpe } from '@/hooks/conexionNeta/UseConexionNetaOpe'
 import type {
+    DatumCOL,
+    DatumGT,
     DatumSupervisorsResponse,
     DatumWild,
 } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 import { conexionNetaOperacionesApi } from '@/api/conexion-neta/conexion-neta-operaciones.api'
-import { GT_UAD_IDS } from '@/constants/uads'
+import { getUadReportType } from '@/constants/uads'
 import { useEffect, useMemo, useState } from 'react'
 import { MdChevronLeft, MdChevronRight, MdClose, MdSearch, MdViewColumn } from 'react-icons/md'
 import { LuUser } from 'react-icons/lu'
 import { TableSkeleton } from './TableSkeleton'
-import { MERGED_CELL_FONT_SIZE_PX } from './utils/columns-cno'
+import { COLUMN_DEFINITIONS_BY_REPORT_TYPE, MERGED_CELL_FONT_SIZE_PX } from './utils/columns-cno'
 import {
     PAGE_SIZE_OPTIONS,
     useTableConexionNeta,
@@ -37,17 +39,32 @@ const secondaryBtn =
 const disabledBtn =
     'cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-100 hover:border-slate-200 active:scale-100'
 
+type ActiveRow = DatumGT | DatumWild | DatumCOL
+
 export const ConexionNetaOpe = () => {
     const { dateRange } = useDateContext()
-    const { data, dataGT, loading, loadingGT, error, fetchConexionNeta, fetchConexionNetaGT } =
-        useConexionNetaOpe()
+    const {
+        data,
+        dataGT,
+        dataCOL,
+        loading,
+        loadingGT,
+        loadingCOL,
+        error,
+        fetchConexionNeta,
+        fetchConexionNetaGT,
+        fetchConexionNetaCol,
+    } = useConexionNetaOpe()
     const [selectedUad, setSelectedUad] = useState<number>(0)
     const [supervisors, setSupervisors] = useState<DatumSupervisorsResponse[]>([])
     const [filters, setFilters] = useState<Filter[]>([])
-    const isGtUad = selectedUad !== null && GT_UAD_IDS.has(selectedUad)
+    const reportType = getUadReportType(selectedUad)
 
-    const activeRows: DatumWild[] = isGtUad ? dataGT : data
-    const activeLoading = isGtUad ? loadingGT : loading
+    const activeRows: ActiveRow[] =
+        reportType === 'gt' ? dataGT : reportType === 'col' ? dataCOL : data
+    const activeLoading =
+        reportType === 'gt' ? loadingGT : reportType === 'col' ? loadingCOL : loading
+    const activeColumns = COLUMN_DEFINITIONS_BY_REPORT_TYPE[reportType]
 
     // Map `sup_code` → `full_name` so we can resolve filter values back to a
     // human label when matching against the row's `POSICION SUP` column.
@@ -110,7 +127,7 @@ export const ConexionNetaOpe = () => {
         isGroupedColumn,
         summary,
         columnSelector,
-    } = useTableConexionNeta(filteredActiveRows)
+    } = useTableConexionNeta(filteredActiveRows, activeColumns, reportType)
 
     const needsScroll = useTableScrollNeeded(visibleColumns.length)
 
@@ -123,13 +140,25 @@ export const ConexionNetaOpe = () => {
             uadId: selectedUad,
         }
 
-        if (isGtUad) {
+        if (reportType === 'gt') {
             void fetchConexionNetaGT(params)
             return
         }
 
+        if (reportType === 'col') {
+            void fetchConexionNetaCol(params)
+            return
+        }
+
         void fetchConexionNeta(params)
-    }, [dateRange, fetchConexionNeta, fetchConexionNetaGT, isGtUad, selectedUad])
+    }, [
+        dateRange,
+        fetchConexionNeta,
+        fetchConexionNetaGT,
+        fetchConexionNetaCol,
+        reportType,
+        selectedUad,
+    ])
 
     useEffect(() => {
         setFilters([])
@@ -371,7 +400,7 @@ export const ConexionNetaOpe = () => {
                                         className='transition-colors hover:bg-background-light/60'
                                     >
                                         {visibleColumns.map(column => {
-                                            const colId = column.id as keyof DatumWild
+                                            const colId = column.id as keyof DatumGT
                                             if (isGroupedColumn(column.id)) {
                                                 const meta = groupMeta.get(colId)?.[rowIndex]
                                                 if (!meta?.render) return null

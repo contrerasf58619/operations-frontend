@@ -1,15 +1,24 @@
-import { DatumGT } from '../interfaces/ConexionNetaOpeRow.interface'
+import { DatumCOL, DatumGT, DatumWild } from '../interfaces/ConexionNetaOpeRow.interface'
 import type { ReactNode } from 'react'
+import type { ConexionNetaReportType } from '@/constants/uads'
 
 export const MERGED_CELL_FONT_SIZE_PX = 14
 
-type RowKey = keyof DatumGT
+// Superset row shape used to type column renderers: the base (GT) fields are
+// always present, while the HN- and COL-specific fields are optional because
+// only the matching dataset carries them; formatValue renders absent values
+// as '--'. Columns are only ever paired with rows of their own report type.
+export type ConexionNetaRenderRow = DatumGT &
+    Partial<Omit<DatumWild, keyof DatumGT>> &
+    Partial<Omit<DatumCOL, keyof DatumGT>>
 
-type TableColumn = {
+type RowKey = keyof ConexionNetaRenderRow
+
+export type TableColumn = {
     id: string
     label: string
     sourceKeys: RowKey[]
-    render: (row: DatumGT) => ReactNode
+    render: (row: ConexionNetaRenderRow) => ReactNode
     headerClassName?: string
     cellClassName?: string
 }
@@ -26,7 +35,9 @@ function formatValue(value: unknown) {
     return String(value)
 }
 
-export const COLUMN_DEFINITIONS: TableColumn[] = [
+// Shared base column set: these ids exist in the GT, HN and COL responses
+// alike, and this array is exactly today's GT table (content, order, labels).
+export const GT_COLUMN_DEFINITIONS: TableColumn[] = [
     {
         id: 'ROSTER',
         label: 'ID Empleado',
@@ -278,3 +289,202 @@ export const COLUMN_DEFINITIONS: TableColumn[] = [
         cellClassName: 'font-mono whitespace-nowrap',
     },
 ]
+
+// Extra columns per report type, keyed by the id of the base column they
+// follow, mirroring the key order of the backend formatter response.
+const HN_EXTRA_COLUMNS: Record<string, TableColumn[]> = {
+    CONEXION_DMD: [
+        {
+            id: 'CONEXION_AM',
+            label: 'Conexión AM',
+            sourceKeys: ['CONEXION_AM'],
+            render: row => formatValue(row.CONEXION_AM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'CONEXION_MIXTA',
+            label: 'Conexión Mixta',
+            sourceKeys: ['CONEXION_MIXTA'],
+            render: row => formatValue(row.CONEXION_MIXTA),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'CONEXION_PM',
+            label: 'Conexión PM',
+            sourceKeys: ['CONEXION_PM'],
+            render: row => formatValue(row.CONEXION_PM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+    HORAS_EXTRA_SEG: [
+        {
+            id: 'HORAS_RECARGO',
+            label: 'Horas Recargo',
+            sourceKeys: ['HORAS_RECARGO'],
+            render: row => formatValue(row.HORAS_RECARGO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_EXTRA_AM',
+            label: 'Horas Extra AM',
+            sourceKeys: ['HORAS_EXTRA_AM'],
+            render: row => formatValue(row.HORAS_EXTRA_AM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_EXTRA_MI',
+            label: 'Horas Extra MI',
+            sourceKeys: ['HORAS_EXTRA_MI'],
+            render: row => formatValue(row.HORAS_EXTRA_MI),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_EXTRA_PM',
+            label: 'Horas Extra PM',
+            sourceKeys: ['HORAS_EXTRA_PM'],
+            render: row => formatValue(row.HORAS_EXTRA_PM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+    'HORAS DDD': [
+        {
+            id: 'HORAS_DDD_AM',
+            label: 'Horas DDD AM',
+            sourceKeys: ['HORAS_DDD_AM'],
+            render: row => formatValue(row.HORAS_DDD_AM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_DDD_MI',
+            label: 'Horas DDD MI',
+            sourceKeys: ['HORAS_DDD_MI'],
+            render: row => formatValue(row.HORAS_DDD_MI),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_DDD_PM',
+            label: 'Horas DDD PM',
+            sourceKeys: ['HORAS_DDD_PM'],
+            render: row => formatValue(row.HORAS_DDD_PM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+}
+
+const COL_EXTRA_COLUMNS: Record<string, TableColumn[]> = {
+    CONEXION_DMD: [
+        {
+            id: 'CONEXION_AM',
+            label: 'Conexión AM',
+            sourceKeys: ['CONEXION_AM'],
+            render: row => formatValue(row.CONEXION_AM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'CONEXION_PM',
+            label: 'Conexión PM',
+            sourceKeys: ['CONEXION_PM'],
+            render: row => formatValue(row.CONEXION_PM),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'CONEXION_AM_CALCULADA',
+            label: 'Conexión AM Calc',
+            sourceKeys: ['CONEXION_AM_CALCULADA'],
+            render: row => formatValue(row.CONEXION_AM_CALCULADA),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'CONEXION_PM_CALCULADA',
+            label: 'Conexión PM Calc',
+            sourceKeys: ['CONEXION_PM_CALCULADA'],
+            render: row => formatValue(row.CONEXION_PM_CALCULADA),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+    HORAS_EXTRA_SEG: [
+        {
+            id: 'HORAS_EXTRA_DIURNO',
+            label: 'Horas Extra Diurno',
+            sourceKeys: ['HORAS_EXTRA_DIURNO'],
+            render: row => formatValue(row.HORAS_EXTRA_DIURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_EXTRA_NOCTURNO',
+            label: 'Horas Extra Nocturno',
+            sourceKeys: ['HORAS_EXTRA_NOCTURNO'],
+            render: row => formatValue(row.HORAS_EXTRA_NOCTURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+    'HORAS DDD': [
+        {
+            id: 'HORAS_DDD_DIURNO',
+            label: 'Horas DDD Diurno',
+            sourceKeys: ['HORAS_DDD_DIURNO'],
+            render: row => formatValue(row.HORAS_DDD_DIURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_DDD_NOCTURNO',
+            label: 'Horas DDD Nocturno',
+            sourceKeys: ['HORAS_DDD_NOCTURNO'],
+            render: row => formatValue(row.HORAS_DDD_NOCTURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+    HORAS_JORNADA_SEG: [
+        {
+            id: 'HORAS_ORDINARIAS_DIURNO',
+            label: 'Horas Ordinarias Diurno',
+            sourceKeys: ['HORAS_ORDINARIAS_DIURNO'],
+            render: row => formatValue(row.HORAS_ORDINARIAS_DIURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'HORAS_ORDINARIAS_NOCTURNO',
+            label: 'Horas Ordinarias Nocturno',
+            sourceKeys: ['HORAS_ORDINARIAS_NOCTURNO'],
+            render: row => formatValue(row.HORAS_ORDINARIAS_NOCTURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'RECARGO_DIURNO',
+            label: 'Recargo Diurno',
+            sourceKeys: ['RECARGO_DIURNO'],
+            render: row => formatValue(row.RECARGO_DIURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'RECARGO_NOCTURNO',
+            label: 'Recargo Nocturno',
+            sourceKeys: ['RECARGO_NOCTURNO'],
+            render: row => formatValue(row.RECARGO_NOCTURNO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+        {
+            id: 'RECARGO_NOCTURNO_DOMINGO',
+            label: 'Recargo Nocturno Domingo',
+            sourceKeys: ['RECARGO_NOCTURNO_DOMINGO'],
+            render: row => formatValue(row.RECARGO_NOCTURNO_DOMINGO),
+            cellClassName: 'font-mono whitespace-nowrap',
+        },
+    ],
+}
+
+function withExtraColumns(extraColumnsAfter: Record<string, TableColumn[]>): TableColumn[] {
+    return GT_COLUMN_DEFINITIONS.flatMap(column => [
+        column,
+        ...(extraColumnsAfter[column.id] ?? []),
+    ])
+}
+
+export const HN_COLUMN_DEFINITIONS: TableColumn[] = withExtraColumns(HN_EXTRA_COLUMNS)
+export const COL_COLUMN_DEFINITIONS: TableColumn[] = withExtraColumns(COL_EXTRA_COLUMNS)
+
+export const COLUMN_DEFINITIONS_BY_REPORT_TYPE: Record<ConexionNetaReportType, TableColumn[]> = {
+    gt: GT_COLUMN_DEFINITIONS,
+    hn: HN_COLUMN_DEFINITIONS,
+    col: COL_COLUMN_DEFINITIONS,
+}

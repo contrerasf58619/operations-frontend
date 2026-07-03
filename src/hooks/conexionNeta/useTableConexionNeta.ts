@@ -10,8 +10,11 @@ import {
     type RefObject,
     type SetStateAction,
 } from 'react'
-import type { DatumWild } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
-import { COLUMN_DEFINITIONS } from '@/components/reports/operaciones/utils/columns-cno'
+import type { DatumGT } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
+import type { TableColumn } from '@/components/reports/operaciones/utils/columns-cno'
+import type { ConexionNetaReportType } from '@/constants/uads'
+
+export type { TableColumn }
 
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const
 export type PageSize = (typeof PAGE_SIZE_OPTIONS)[number]
@@ -26,7 +29,9 @@ export const FALLBACK_COLUMN_IDS: string[] = [
     // 'PORCENTAJE_CONEXION',
 ]
 
-export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
+// Every grouped id is part of the shared base column set, so the same set
+// applies to the GT, HN and COL column definitions alike.
+export const GROUPED_COLUMN_IDS = new Set<keyof DatumGT>([
     'WP_HOURS',
     'LAW_HOURS',
     'CALCULATED_LAW_HOURS',
@@ -38,10 +43,31 @@ export const GROUPED_COLUMN_IDS = new Set<keyof DatumWild>([
     'CONEXION_NETA_CALCULADA_WEEKLY',
 ])
 
-const ALL_COLUMN_IDS: string[] = COLUMN_DEFINITIONS.map(column => column.id)
-const VISIBLE_COLUMNS_STORAGE_KEY = 'conexion-neta-ope:visible-columns'
+// Saved column selections are namespaced per report type because each type
+// has a different column set. The legacy un-namespaced key predates the
+// namespacing and is read once as a fallback so existing selections carry
+// over instead of silently resetting.
+const VISIBLE_COLUMNS_STORAGE_KEY_PREFIX = 'conexion-neta-ope:visible-columns'
+const LEGACY_VISIBLE_COLUMNS_STORAGE_KEY = 'conexion-neta-ope:visible-columns'
 
-export type TableColumn = (typeof COLUMN_DEFINITIONS)[number]
+function readStoredColumnIds(storageKey: string, validIds: string[]): string[] | null {
+    try {
+        const raw =
+            localStorage.getItem(storageKey) ??
+            localStorage.getItem(LEGACY_VISIBLE_COLUMNS_STORAGE_KEY)
+        if (!raw) return null
+        const parsed: unknown = JSON.parse(raw)
+        if (!Array.isArray(parsed)) return null
+        const sanitized = parsed.filter(
+            (id): id is string => typeof id === 'string' && validIds.includes(id),
+        )
+        return sanitized.length > 0 ? sanitized : null
+    } catch {
+        // ignore unreadable/corrupt storage
+        return null
+    }
+}
+
 export type CellMeta = { render: boolean; rowspan: number }
 
 export interface TableSummary {
@@ -69,7 +95,7 @@ export interface ColumnSelectorAPI {
     reset: () => void
 }
 
-export interface UseTableConexionNetaReturn {
+export interface UseTableConexionNetaReturn<Row extends DatumGT> {
     searchQuery: string
     setSearchQuery: Dispatch<SetStateAction<string>>
     currentPage: number
@@ -77,17 +103,17 @@ export interface UseTableConexionNetaReturn {
     rowsPerPage: PageSize
     setRowsPerPage: Dispatch<SetStateAction<PageSize>>
     totalPages: number
-    sortedRows: DatumWild[]
-    filteredRows: DatumWild[]
-    pagedRows: DatumWild[]
+    sortedRows: Row[]
+    filteredRows: Row[]
+    pagedRows: Row[]
     visibleColumns: TableColumn[]
-    groupMeta: Map<keyof DatumWild, CellMeta[]>
+    groupMeta: Map<keyof DatumGT, CellMeta[]>
     isGroupedColumn: (columnId: string) => boolean
     summary: TableSummary
     columnSelector: ColumnSelectorAPI
 }
 
-function computeGroupMeta(rows: DatumWild[], columnId: keyof DatumWild): CellMeta[] {
+function computeGroupMeta<Row extends DatumGT>(rows: Row[], columnId: keyof DatumGT): CellMeta[] {
     const meta: CellMeta[] = rows.map(() => ({ render: true, rowspan: 1 }))
 
     for (let i = rows.length - 1; i > 0; i--) {
@@ -103,42 +129,44 @@ function computeGroupMeta(rows: DatumWild[], columnId: keyof DatumWild): CellMet
     return meta
 }
 
-function sortRowsByRoster(leftRow: DatumWild, rightRow: DatumWild) {
+function sortRowsByRoster(leftRow: DatumGT, rightRow: DatumGT) {
     return Number(leftRow.ROSTER) - Number(rightRow.ROSTER)
 }
 
-export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaReturn {
+export function useTableConexionNeta<Row extends DatumGT>(
+    rows: Row[],
+    columns: TableColumn[],
+    reportType: ConexionNetaReportType,
+): UseTableConexionNetaReturn<Row> {
     const [searchQuery, setSearchQuery] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState<PageSize>(5)
     const [visibleColumnIds, setVisibleColumnIds] = useState<string[]>(FALLBACK_COLUMN_IDS)
     const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false)
     const columnSelectorRef = useRef<HTMLDivElement>(null)
+    const hydratedStorageKeyRef = useRef<string | null>(null)
+
+    const storageKey = `${VISIBLE_COLUMNS_STORAGE_KEY_PREFIX}:${reportType}`
+    const allColumnIds = useMemo(() => columns.map(column => column.id), [columns])
 
     useEffect(() => {
-        try {
-            const raw = localStorage.getItem(VISIBLE_COLUMNS_STORAGE_KEY)
-            if (!raw) return
-            const parsed: unknown = JSON.parse(raw)
-            if (!Array.isArray(parsed)) return
-            const sanitized = parsed.filter(
-                (id): id is string => typeof id === 'string' && ALL_COLUMN_IDS.includes(id),
-            )
-            if (sanitized.length > 0) {
-                setVisibleColumnIds(sanitized)
-            }
-        } catch {
-            // ignore unreadable/corrupt storage
+        setVisibleColumnIds(readStoredColumnIds(storageKey, allColumnIds) ?? FALLBACK_COLUMN_IDS)
+    }, [storageKey, allColumnIds])
+
+    useEffect(() => {
+        if (hydratedStorageKeyRef.current !== storageKey) {
+            // First run after mount or a report-type switch: `visibleColumnIds`
+            // may still hold the previous type's selection, so skip this write
+            // to avoid leaking it into the new type's storage entry.
+            hydratedStorageKeyRef.current = storageKey
+            return
         }
-    }, [])
-
-    useEffect(() => {
         try {
-            localStorage.setItem(VISIBLE_COLUMNS_STORAGE_KEY, JSON.stringify(visibleColumnIds))
+            localStorage.setItem(storageKey, JSON.stringify(visibleColumnIds))
         } catch {
             // ignore quota / disabled storage
         }
-    }, [visibleColumnIds])
+    }, [storageKey, visibleColumnIds])
 
     useEffect(() => {
         if (!isColumnSelectorOpen) return
@@ -154,21 +182,24 @@ export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaRet
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [isColumnSelectorOpen])
 
-    const toggleColumn = useCallback((columnId: string, checked: boolean) => {
-        setVisibleColumnIds(prev => {
-            if (checked) {
-                if (prev.includes(columnId)) return prev
-                const next = new Set([...prev, columnId])
-                return ALL_COLUMN_IDS.filter(id => next.has(id))
-            }
-            if (prev.length <= 1) return prev
-            return prev.filter(id => id !== columnId)
-        })
-    }, [])
+    const toggleColumn = useCallback(
+        (columnId: string, checked: boolean) => {
+            setVisibleColumnIds(prev => {
+                if (checked) {
+                    if (prev.includes(columnId)) return prev
+                    const next = new Set([...prev, columnId])
+                    return allColumnIds.filter(id => next.has(id))
+                }
+                if (prev.length <= 1) return prev
+                return prev.filter(id => id !== columnId)
+            })
+        },
+        [allColumnIds],
+    )
 
     const selectAllColumns = useCallback(() => {
-        setVisibleColumnIds(ALL_COLUMN_IDS)
-    }, [])
+        setVisibleColumnIds(allColumnIds)
+    }, [allColumnIds])
 
     const resetColumns = useCallback(() => {
         setVisibleColumnIds(FALLBACK_COLUMN_IDS)
@@ -198,7 +229,7 @@ export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaRet
     }, [filteredRows, currentPage, rowsPerPage])
 
     const groupMeta = useMemo(() => {
-        const map = new Map<keyof DatumWild, CellMeta[]>()
+        const map = new Map<keyof DatumGT, CellMeta[]>()
         for (const colId of GROUPED_COLUMN_IDS) {
             map.set(colId, computeGroupMeta(pagedRows, colId))
         }
@@ -207,8 +238,8 @@ export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaRet
 
     const visibleColumns = useMemo(() => {
         const selected = new Set(visibleColumnIds)
-        return COLUMN_DEFINITIONS.filter(column => selected.has(column.id))
-    }, [visibleColumnIds])
+        return columns.filter(column => selected.has(column.id))
+    }, [columns, visibleColumnIds])
 
     const summary = useMemo<TableSummary>(() => {
         const uniqueRosters = new Set(filteredRows.map(row => row.ROSTER)).size
@@ -226,7 +257,7 @@ export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaRet
     const columnSelectorItems = useMemo<ColumnSelectorItem[]>(() => {
         const onlyOne = visibleColumnIds.length === 1
         const selected = new Set(visibleColumnIds)
-        return COLUMN_DEFINITIONS.map(column => {
+        return columns.map(column => {
             const checked = selected.has(column.id)
             return {
                 column,
@@ -234,10 +265,10 @@ export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaRet
                 isOnlySelected: checked && onlyOne,
             }
         })
-    }, [visibleColumnIds])
+    }, [columns, visibleColumnIds])
 
     const isGroupedColumn = useCallback(
-        (columnId: string) => GROUPED_COLUMN_IDS.has(columnId as keyof DatumWild),
+        (columnId: string) => GROUPED_COLUMN_IDS.has(columnId as keyof DatumGT),
         [],
     )
 
@@ -262,7 +293,7 @@ export function useTableConexionNeta(rows: DatumWild[]): UseTableConexionNetaRet
             containerRef: columnSelectorRef,
             items: columnSelectorItems,
             visibleCount: visibleColumnIds.length,
-            totalCount: ALL_COLUMN_IDS.length,
+            totalCount: allColumnIds.length,
             toggle: toggleColumn,
             selectAll: selectAllColumns,
             reset: resetColumns,
