@@ -4,6 +4,7 @@ import { baseURL } from '../baseURL'
 import {
     DatumWild,
     DatumGT,
+    DatumCOL,
     DatumSupervisorsResponse,
 } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
 
@@ -30,6 +31,13 @@ export const conexionNetaOperacionesApi = {
     getConexionNetaOpeGT(params: ConexionNetaOpeParams) {
         const route = baseURL(api, 'conexion-neta-operaciones/gt', params)
         return axios.get<{ status: number; data: DatumGT[] }>(route, {
+            headers: getHeaders(),
+            timeout: 65000,
+        })
+    },
+    getConexionNetaOpeCol(params: ConexionNetaOpeParams) {
+        const route = baseURL(api, 'conexion-neta-operaciones/col', params)
+        return axios.get<{ status: number; data: DatumCOL[] }>(route, {
             headers: getHeaders(),
             timeout: 65000,
         })

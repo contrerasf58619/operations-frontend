@@ -37,3 +37,24 @@ export const GT_UAD_IDS = new Set(
         option => option.value,
     ),
 )
+
+// Colombia UADs use both ' Col' and ' CL' name suffixes (e.g. 'TPG Col',
+// 'Verizon CL').
+export const COL_UAD_IDS = new Set(
+    UAD_CATALOG.filter(option => {
+        const name = option.name.toLowerCase()
+        return name.endsWith(' col') || name.endsWith(' cl')
+    }).map(option => option.value),
+)
+
+export type ConexionNetaReportType = 'gt' | 'hn' | 'col'
+
+// The UAD catalog carries no country field (backend returns only name/value),
+// so the report type is derived from the UAD name suffix, same as GT_UAD_IDS.
+// UADs matching neither set keep hitting the root endpoint (HN dataset),
+// preserving the pre-COL routing behavior.
+export function getUadReportType(uadId: number): ConexionNetaReportType {
+    if (GT_UAD_IDS.has(uadId)) return 'gt'
+    if (COL_UAD_IDS.has(uadId)) return 'col'
+    return 'hn'
+}

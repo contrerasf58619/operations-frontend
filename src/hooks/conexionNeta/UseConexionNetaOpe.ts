@@ -5,6 +5,7 @@ import {
     ConexionNetaOpeParams,
 } from '@/api/conexion-neta/conexion-neta-operaciones.api'
 import {
+    DatumCOL,
     DatumGT,
     DatumWild,
 } from '@/components/reports/operaciones/interfaces/ConexionNetaOpeRow.interface'
@@ -37,8 +38,10 @@ function describeFetchError(err: unknown, label: string) {
 interface UseConexionNetaOpeState {
     data: DatumWild[]
     dataGT: DatumGT[]
+    dataCOL: DatumCOL[]
     loading: boolean
     loadingGT: boolean
+    loadingCOL: boolean
     error: string | null
 }
 
@@ -46,8 +49,10 @@ export const useConexionNetaOpe = () => {
     const [state, setState] = useState<UseConexionNetaOpeState>({
         data: [],
         dataGT: [],
+        dataCOL: [],
         loading: false,
         loadingGT: false,
+        loadingCOL: false,
         error: null,
     })
 
@@ -79,9 +84,24 @@ export const useConexionNetaOpe = () => {
         }
     }, [])
 
+    const fetchConexionNetaCol = useCallback(async (params: ConexionNetaOpeParams) => {
+        setState(prev => ({ ...prev, loadingCOL: true, error: null }))
+        try {
+            const res = await conexionNetaOperacionesApi.getConexionNetaOpeCol(params)
+            setState(prev => ({ ...prev, dataCOL: res.data.data, loadingCOL: false }))
+        } catch (err) {
+            setState(prev => ({
+                ...prev,
+                loadingCOL: false,
+                error: describeFetchError(err, 'conexión neta COL'),
+            }))
+        }
+    }, [])
+
     return {
         ...state,
         fetchConexionNeta,
         fetchConexionNetaGT,
+        fetchConexionNetaCol,
     }
 }
