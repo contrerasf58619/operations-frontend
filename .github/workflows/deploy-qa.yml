@@ -13,6 +13,15 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v6
 
+            # Notify Teams: deployment started
+            - name: Notify Teams (started)
+              env:
+                  TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL_QA }}
+              run: |
+                  bash scripts/notify-teams.sh started QA "dev → qa" \
+                      "${{ github.repository }}" "${GITHUB_SHA::7}" "${{ github.actor }}" \
+                      "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
             # Step 2: Configure AWS credentials
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v6
@@ -68,3 +77,36 @@ jobs:
                   service: operations-web-qa
                   task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
                   wait-for-service-stability: true
+
+            # Re-check ECS service stability before notifying (retry wrapper: the
+            # waiter polls every 15s / max 40 attempts, so each cycle is ~10 min)
+            - name: Wait for ECS service stability
+              run: |
+                  for attempt in 1 2 3; do
+                      if aws ecs wait services-stable --cluster fargate-cluster-ats --services operations-web-qa; then
+                          echo "Service operations-web-qa is stable (attempt ${attempt})"
+                          exit 0
+                      fi
+                      echo "::warning:: services-stable wait attempt ${attempt} did not complete, retrying..."
+                  done
+                  echo "Service operations-web-qa did not stabilize after 3 wait cycles (~30 min)"
+                  exit 1
+
+            # Notify Teams: deployment succeeded (only reached once the service is stable)
+            - name: Notify Teams (success)
+              env:
+                  TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL_QA }}
+              run: |
+                  bash scripts/notify-teams.sh success QA "dev → qa" \
+                      "${{ github.repository }}" "${GITHUB_SHA::7}" "${{ github.actor }}" \
+                      "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+            # Notify Teams: any step in the job failed
+            - name: Notify Teams (failure)
+              if: failure()
+              env:
+                  TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL_QA }}
+              run: |
+                  bash scripts/notify-teams.sh failure QA "dev → qa" \
+                      "${{ github.repository }}" "${GITHUB_SHA::7}" "${{ github.actor }}" \
+                      "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
