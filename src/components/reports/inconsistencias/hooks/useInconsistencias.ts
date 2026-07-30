@@ -191,6 +191,7 @@ export const useInconsistencias = () => {
                 toast.error('El reporte está tardando demasiado en generarse. Intenta más tarde.')
             }
         } catch (error) {
+            console.log(error)
             toast.error('Error al buscar reportes')
         } finally {
             setLoading(false)
@@ -233,6 +234,7 @@ export const useInconsistencias = () => {
             document.body.removeChild(a)
             URL.revokeObjectURL(url)
         } catch (error) {
+            console.log(error)
             toast.error('Ocurrió un error al generar el reporte CSV')
         } finally {
             setSaving(false)
