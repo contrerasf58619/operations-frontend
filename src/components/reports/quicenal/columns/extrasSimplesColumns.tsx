@@ -1,33 +1,27 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { getPercentageColor } from '../Quincenal'
+import { ExtrasSimpleVariationRow } from '@/api/reports-api/quincenal.api'
 
-interface HorasExtraSimplesInterface {
-    roster_id: number
-    extras_simples_post: string
-    extras_simples_actual: string
-    hours_simple_variation: string
-    porcentaje: number
-}
-
-export const columnsExtrasSimples: ColumnDef<HorasExtraSimplesInterface>[] = [
+export const columnsExtrasSimples: ColumnDef<ExtrasSimpleVariationRow>[] = [
     {
-        accessorKey: 'roster_id',
-        header: 'Roster ID',
+        accessorKey: 'cuenta',
+        header: 'Cuenta',
+        cell: info => (info.getValue() as string | null) ?? '—',
     },
     {
-        accessorKey: 'extras_simples_post',
-        header: 'Extras Simples Posterior',
+        accessorKey: 'extras_simple_prior',
+        header: 'Extras Simples Quincena Anterior',
     },
     {
-        accessorKey: 'extras_simples_actual',
-        header: 'Extras Simples Actual',
+        accessorKey: 'extras_simple_current',
+        header: 'Extras Simples Quincena Actual',
     },
     {
-        accessorKey: 'hours_simple_variation',
+        accessorKey: 'hrs_simple_variation',
         header: 'Hrs Simples Variación',
     },
     {
-        accessorKey: 'porcentaje',
+        accessorKey: 'pct_variation_extras_simple',
         header: 'Variación Extras Simples',
         cell: info => (
             <span

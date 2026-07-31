@@ -1,34 +1,28 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { getPercentageColor } from '../Quincenal'
+import { TotalExtrasSimpleVariationRow } from '@/api/reports-api/quincenal.api'
 
-interface TotalHorasExtraSimplesInterface {
-    roster_id: number
-    total_extras_simples_post: string
-    total_extras_simples_actual: string
-    total_extras_simples_variation: string
-    porcentaje: number
-}
-
-export const columnsExtrasSimples: ColumnDef<TotalHorasExtraSimplesInterface>[] = [
+export const columnsTotalExtrasSimples: ColumnDef<TotalExtrasSimpleVariationRow>[] = [
     {
-        accessorKey: 'roster_id',
-        header: 'Roster ID',
+        accessorKey: 'cuenta',
+        header: 'Cuenta',
+        cell: info => (info.getValue() as string | null) ?? '—',
     },
     {
-        accessorKey: 'total_extras_simples_post',
-        header: 'Extras Simples Posterior',
+        accessorKey: 'total_extras_simple_prior',
+        header: 'Total Extras Simples Quincena Anterior',
     },
     {
-        accessorKey: 'total_extras_simples_actual',
-        header: 'Extras Simples Actual',
+        accessorKey: 'total_extras_simple_current',
+        header: 'Total Extras Simples Quincena Actual',
     },
     {
-        accessorKey: 'total_extras_simples_variation',
-        header: 'Hrs Simples Variación',
+        accessorKey: 'hrs_total_variation',
+        header: 'Hrs Total Variación',
     },
     {
-        accessorKey: 'porcentaje',
-        header: 'Variación Extras Simples',
+        accessorKey: 'pct_variation_total_extras',
+        header: 'Variación Total Extras',
         cell: info => (
             <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getPercentageColor(Number(info.getValue()))}`}

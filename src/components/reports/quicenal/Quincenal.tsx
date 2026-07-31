@@ -6,6 +6,19 @@ import { UadList } from '@/components/catalogs/UadList'
 import { DataTable } from '@/components/UI/DataTable'
 import { Tabs, Tab } from '@/components/UI/Tabs'
 import { PayrollBeforeDatesSelector } from '@/components/UI/PayrollBeforeDatesSelector'
+import {
+    columnsExtrasDDD,
+    columnsExtrasSimples,
+    columnsExtrasWp,
+    // columnsRecargoNocturno,
+    columnsTotalExtrasSimples,
+} from './columns'
+import {
+    useExtrasSimplesAlerts,
+    useExtrasDDDAlerts,
+    useExtrasWpAlerts,
+    useTotalExtrasSimplesAlerts,
+} from '@/hooks/useAlerts'
 
 export const getPercentageColor = (porcentaje: number) => {
     if (porcentaje <= 10) return 'text-green-600 bg-green-50'
@@ -17,25 +30,34 @@ const Quincenal: React.FC = () => {
     const [selectedUad, setSelectedUad] = useState<number>(0)
     const [selectedNomina, setSelectedNomina] = useState<number>(0)
 
-    const [activeTab, setActiveTab] = useState<'extras' | 'asueto' | 'jornada'>('extras')
+    const [activeTab, setActiveTab] = useState<
+        'extras-simples' | 'ddd-asuetos' | 'extras-wp' | 'total-extras-simples' | 'extras-nocturno'
+    >('extras-simples')
 
     useEffect(() => {
         setSelectedNomina(0)
     }, [selectedUad])
 
-    // const { alerts: alertsData, loading: loadingAlerts } = useOvertimeAlerts(
-    //     selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null,
-    // )
+    const { alerts: alertDataExtraSimples, loading: loadingAlertsSimples } = useExtrasSimplesAlerts(
+        selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null,
+    )
 
-    // const { alerts: alertsDataWorkDay, loading: loadingAlertsWorkDay } = useHoursOnTheWorkday(
-    //     selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null,
-    // )
+    const { alerts: alertsDataExtrasDdd, loading: loadingAlertExtrasDDD } = useExtrasDDDAlerts(
+        selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null,
+    )
 
-    // const { alerts: alertsDataVacation, loading: loadingAlertsVacation } = useHoursOnVacation(
-    //     selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null,
-    // )
+    const { alerts: alertsDataExtrasWp, loading: loadingAlertExtrasWp } = useExtrasWpAlerts(
+        selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null,
+    )
 
-    // const showTable = selectedUad !== 0 && selectedNomina !== 0 && !loadingAlerts
+    const { alerts: alertsDataTotalExtrasSimples, loading: loadingAlertsTotalExtrasSimples } =
+        useTotalExtrasSimplesAlerts(
+            selectedUad && selectedNomina
+                ? { uadId: selectedUad, idPayroll: selectedNomina }
+                : null,
+        )
+
+    const showTable = selectedUad !== 0 && selectedNomina !== 0 && !loadingAlertsSimples
 
     return (
         <div className='p-6 min-h-screen'>
@@ -84,46 +106,67 @@ const Quincenal: React.FC = () => {
                 </div>
 
                 {/* Loading Indicator for Table */}
-                {/* {loadingAlerts && loadingAlertsWorkDay && loadingAlertsVacation && (
-                    <div className='flex justify-center my-8'>
-                        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
-                    </div>
-                )} */}
+                {loadingAlertsSimples &&
+                    loadingAlertExtrasDDD &&
+                    loadingAlertExtrasWp &&
+                    loadingAlertsTotalExtrasSimples && (
+                        <div className='flex justify-center my-8'>
+                            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+                        </div>
+                    )}
 
                 {/* Tabs and Data Table */}
                 {/* Tabs */}
-                {/* {showTable && (
+                {showTable && (
                     <div className='mt-2'>
                         <Tabs activeTab={activeTab} onChange={id => setActiveTab(id as any)}>
-                            <Tab id='extras' label='Horas extras'>
+                            <Tab id='extras-simples' label='Extras simples'>
                                 <DataTable
-                                    data={alertsData}
-                                    columns={columnsUpdate}
+                                    data={alertDataExtraSimples}
+                                    columns={columnsExtrasSimples}
                                     searchPlaceholder='Buscar roster, semana, etc...'
                                     noDataText='No se encontraron alertas de horas extra.'
                                 />
                             </Tab>
 
-                            <Tab id='asueto' label='Horas en asueto'>
+                            <Tab id='ddd-asuetos' label='Extras DDD'>
                                 <DataTable
-                                    data={alertsDataVacation}
-                                    columns={columnsVacations}
+                                    data={alertsDataExtrasDdd}
+                                    columns={columnsExtrasDDD}
                                     searchPlaceholder='Buscar roster, semana, etc...'
                                     noDataText='No se encontraron alertas de horas extra.'
                                 />
                             </Tab>
 
-                            <Tab id='jornada' label='Horas jornada'>
+                            <Tab id='extras-wp' label='Extras WP'>
+                                <DataTable
+                                    data={alertsDataExtrasWp}
+                                    columns={columnsExtrasWp}
+                                    searchPlaceholder='Buscar roster, semana, etc...'
+                                    noDataText='No se encontraron alertas de horas extra.'
+                                />
+                            </Tab>
+
+                            <Tab id='total-extras-simples' label='Total Extras Simples'>
+                                <DataTable
+                                    data={alertsDataTotalExtrasSimples}
+                                    columns={columnsTotalExtrasSimples}
+                                    searchPlaceholder='Buscar roster, semana, etc...'
+                                    noDataText='No se encontraron alertas de horas extra.'
+                                />
+                            </Tab>
+
+                            {/* <Tab id='extras-nocturno' label='Extras Nocturno'>
                                 <DataTable
                                     data={alertsDataWorkDay}
-                                    columns={columnsWorkday}
+                                    columns={columnsTotalExtrasSimples}
                                     searchPlaceholder='Buscar roster, semana, etc...'
                                     noDataText='No se encontraron alertas de horas extra.'
                                 />
-                            </Tab>
+                            </Tab> */}
                         </Tabs>
                     </div>
-                )} */}
+                )}
             </div>
         </div>
     )

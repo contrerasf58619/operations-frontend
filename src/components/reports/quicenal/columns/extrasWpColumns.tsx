@@ -1,33 +1,27 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { getPercentageColor } from '../Quincenal'
+import { ExtrasWpVariationRow } from '@/api/reports-api/quincenal.api'
 
-interface HorasExtraWpInterface {
-    roster_id: number
-    extras_wp_post: string
-    extras_wp_actual: string
-    hours_wp_variation: string
-    porcentaje: number
-}
-
-export const columnsExtrasWp: ColumnDef<HorasExtraWpInterface>[] = [
+export const columnsExtrasWp: ColumnDef<ExtrasWpVariationRow>[] = [
     {
-        accessorKey: 'roster_id',
-        header: 'Roster ID',
+        accessorKey: 'cuenta',
+        header: 'Cuenta',
+        cell: info => (info.getValue() as string | null) ?? '—',
     },
     {
-        accessorKey: 'extras_wp_post',
-        header: 'Extras WP Posterior',
+        accessorKey: 'extras_wp_prior',
+        header: 'Extras WP Quincena Anterior',
     },
     {
-        accessorKey: 'extras_wp_actual',
-        header: 'Extras WP Actual',
+        accessorKey: 'extras_wp_current',
+        header: 'Extras WP Quincena Actual',
     },
     {
-        accessorKey: 'hours_wp_variation',
+        accessorKey: 'hrs_wp_variation',
         header: 'Hrs WP Variación',
     },
     {
-        accessorKey: 'porcentaje',
+        accessorKey: 'pct_variation_extras_wp',
         header: 'Variación Extras WP',
         cell: info => (
             <span

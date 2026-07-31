@@ -84,3 +84,11 @@ export const useHoursOnVacation = (payload: OvertimePayload | null) => {
         error,
     }
 }
+
+export const useExtrasSimplesAlerts = payload => {}
+
+export const useExtrasDDDAlerts = payload => {}
+
+export const useExtrasWpAlerts = payload => {}
+
+export const useTotalExtrasSimplesAlerts = payload => {}
