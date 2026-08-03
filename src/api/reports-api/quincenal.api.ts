@@ -15,8 +15,7 @@ if (!api) {
  * anterior a partir de `currentPayrollId`. Solo se envía para comparar contra un
  * periodo que NO sea el inmediatamente anterior.
  */
-export interface QuincenaVariationParams
-    extends Record<string, string | number | undefined> {
+export interface QuincenaVariationParams extends Record<string, string | number | undefined> {
     uadId: number
     /** Quincena actual, la que se compara contra la anterior. e.g. 202607012 */
     currentPayrollId: number
@@ -88,13 +87,10 @@ export const quincenasApi = {
 
     getTotalExtrasSimples(params: QuincenaVariationParams) {
         const route = baseURL(api, 'quincenas-ope/total-extras-simples', params)
-        return axios.get<QuincenaVariationResponse<TotalExtrasSimpleVariationRow>>(
-            route,
-            {
-                headers: getHeaders(),
-                timeout: 65000,
-            },
-        )
+        return axios.get<QuincenaVariationResponse<TotalExtrasSimpleVariationRow>>(route, {
+            headers: getHeaders(),
+            timeout: 65000,
+        })
     },
 
     getExtrasDdd(params: QuincenaVariationParams) {
