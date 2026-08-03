@@ -11,10 +11,34 @@ import { DataTable } from '@/components/UI/DataTable'
  * importa esas columnas a través de los reportes.
  */
 
+const PCT_GREEN = 'text-green-600 bg-green-50'
+const PCT_YELLOW = 'text-yellow-600 bg-yellow-50'
+const PCT_RED = 'text-red-600 bg-red-50'
+
+/**
+ * Semaforo de la variacion porcentual.
+ *
+ * Una caida fuerte importa igual que una subida fuerte, asi que los negativos se
+ * evaluan por su propia escala en vez de caer todos en verde (el bug anterior:
+ * `porcentaje <= 10` daba verde a CUALQUIER negativo, -80% incluido).
+ *
+ * Los umbrales NO son simetricos, es a proposito:
+ *
+ *   subida:  [0, 10]    verde | (10, 15]    amarillo | > 15    rojo
+ *   caida:   [0, -10]   verde | (-10, -20]  amarillo | < -20   rojo
+ *
+ * Un `NaN` (fila sin dato) cae en rojo, igual que antes.
+ */
 export const getPercentageColor = (porcentaje: number) => {
-    if (porcentaje <= 10) return 'text-green-600 bg-green-50'
-    if (porcentaje > 10 && porcentaje <= 15) return 'text-yellow-600 bg-yellow-50'
-    return 'text-red-600 bg-red-50'
+    if (porcentaje < 0) {
+        if (porcentaje >= -10) return PCT_GREEN
+        if (porcentaje >= -20) return PCT_YELLOW
+        return PCT_RED
+    }
+
+    if (porcentaje <= 10) return PCT_GREEN
+    if (porcentaje <= 15) return PCT_YELLOW
+    return PCT_RED
 }
 
 interface VariationPanelProps<TData> {
