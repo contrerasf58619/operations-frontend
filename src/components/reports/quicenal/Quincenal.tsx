@@ -2,82 +2,31 @@
 
 import React, { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
-import { ColumnDef } from '@tanstack/react-table'
 import { UadList } from '@/components/catalogs/UadList'
-import { DataTable } from '@/components/UI/DataTable'
-import { Tabs, Tab } from '@/components/UI/Tabs'
 import { PayrollBeforeDatesSelector } from '@/components/UI/PayrollBeforeDatesSelector'
-import {
-    columnsExtrasDDD,
-    columnsExtrasSimples,
-    columnsExtrasWp,
-    // columnsRecargoNocturno,
-    columnsTotalExtrasSimples,
-} from './columns'
-import {
-    useExtrasSimplesAlerts,
-    useExtrasDDDAlerts,
-    useExtrasWpAlerts,
-    useTotalExtrasSimplesAlerts,
-} from '@/hooks/useAlerts'
+import { CuentaReport } from './CuentaReport'
+import { RosterReport } from './RosterReport'
 
-type QuincenalTab =
-    | 'extras-simples'
-    | 'ddd-asuetos'
-    | 'extras-wp'
-    | 'total-extras-simples'
-    | 'extras-nocturno'
+/** Dimensión del reporte: por cuenta (cliente) o por roster (empleado). */
+type GroupBy = 'cuenta' | 'roster'
 
-export const getPercentageColor = (porcentaje: number) => {
-    if (porcentaje <= 10) return 'text-green-600 bg-green-50'
-    if (porcentaje > 10 && porcentaje <= 15) return 'text-yellow-600 bg-yellow-50'
-    return 'text-red-600 bg-red-50'
-}
-
-interface VariationPanelProps<TData> {
-    loading: boolean
-    error?: unknown
-    data: TData[]
-    columns: ColumnDef<TData, any>[]
-}
+const GROUP_BY_OPTIONS: { id: GroupBy; label: string }[] = [
+    { id: 'cuenta', label: 'Por Cuenta' },
+    { id: 'roster', label: 'Por Roster' },
+]
 
 /**
- * Cada tab resuelve su propio estado: los cuatro endpoints se consultan en
- * paralelo y no tienen por que terminar al mismo tiempo, asi que un spinner
- * global dejaria tabs ya listos escondidos detras del mas lento.
+ * Shell del reporte quincenal.
+ *
+ * Aqui solo viven la seleccion de UAD/nomina y el switch de agrupacion; las
+ * tablas las arman `CuentaReport` y `RosterReport`, que reciben el mismo
+ * `payload`. Solo se monta el reporte activo, asi que los endpoints por roster
+ * no se consultan hasta que alguien cambia el switch.
  */
-function VariationPanel<TData>({ loading, error, data, columns }: VariationPanelProps<TData>) {
-    if (loading) {
-        return (
-            <div className='flex justify-center my-8'>
-                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600' />
-            </div>
-        )
-    }
-
-    if (error) {
-        return (
-            <div className='rounded-lg border border-red-200 bg-red-50 px-4 py-8 text-center text-sm text-red-600'>
-                Ocurrió un error al cargar la información. Intenta de nuevo.
-            </div>
-        )
-    }
-
-    return (
-        <DataTable
-            data={data}
-            columns={columns}
-            searchPlaceholder='Buscar cuenta...'
-            noDataText='No se encontraron variaciones para esta quincena.'
-        />
-    )
-}
-
 const Quincenal: React.FC = () => {
     const [selectedUad, setSelectedUad] = useState<number>(0)
     const [selectedNomina, setSelectedNomina] = useState<number>(0)
-
-    const [activeTab, setActiveTab] = useState<QuincenalTab>('extras-simples')
+    const [groupBy, setGroupBy] = useState<GroupBy>('cuenta')
 
     useEffect(() => {
         setSelectedNomina(0)
@@ -85,30 +34,6 @@ const Quincenal: React.FC = () => {
 
     const payload =
         selectedUad && selectedNomina ? { uadId: selectedUad, idPayroll: selectedNomina } : null
-
-    const {
-        alerts: alertDataExtraSimples,
-        loading: loadingAlertsSimples,
-        error: errorAlertsSimples,
-    } = useExtrasSimplesAlerts(payload)
-
-    const {
-        alerts: alertsDataExtrasDdd,
-        loading: loadingAlertExtrasDDD,
-        error: errorAlertExtrasDDD,
-    } = useExtrasDDDAlerts(payload)
-
-    const {
-        alerts: alertsDataExtrasWp,
-        loading: loadingAlertExtrasWp,
-        error: errorAlertExtrasWp,
-    } = useExtrasWpAlerts(payload)
-
-    const {
-        alerts: alertsDataTotalExtrasSimples,
-        loading: loadingAlertsTotalExtrasSimples,
-        error: errorAlertsTotalExtrasSimples,
-    } = useTotalExtrasSimplesAlerts(payload)
 
     const showTable = selectedUad !== 0 && selectedNomina !== 0
 
@@ -158,59 +83,39 @@ const Quincenal: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Tabs and Data Table */}
                 {showTable && (
                     <div className='mt-2'>
-                        <Tabs
-                            activeTab={activeTab}
-                            onChange={id => setActiveTab(id as QuincenalTab)}
+                        {/* Switch de agrupación */}
+                        <div
+                            role='group'
+                            aria-label='Agrupación del reporte'
+                            className='inline-flex rounded-lg border border-gray-200 bg-white p-1 mb-6'
                         >
-                            <Tab id='extras-simples' label='Extras simples'>
-                                <VariationPanel
-                                    loading={loadingAlertsSimples}
-                                    error={errorAlertsSimples}
-                                    data={alertDataExtraSimples}
-                                    columns={columnsExtrasSimples}
-                                />
-                            </Tab>
+                            {GROUP_BY_OPTIONS.map(({ id, label }) => {
+                                const isActive = groupBy === id
+                                return (
+                                    <button
+                                        key={id}
+                                        type='button'
+                                        aria-pressed={isActive}
+                                        onClick={() => setGroupBy(id)}
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                                            isActive
+                                                ? 'bg-blue-600 text-white'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {label}
+                                    </button>
+                                )
+                            })}
+                        </div>
 
-                            <Tab id='ddd-asuetos' label='Extras DDD'>
-                                <VariationPanel
-                                    loading={loadingAlertExtrasDDD}
-                                    error={errorAlertExtrasDDD}
-                                    data={alertsDataExtrasDdd}
-                                    columns={columnsExtrasDDD}
-                                />
-                            </Tab>
-
-                            <Tab id='extras-wp' label='Extras WP'>
-                                <VariationPanel
-                                    loading={loadingAlertExtrasWp}
-                                    error={errorAlertExtrasWp}
-                                    data={alertsDataExtrasWp}
-                                    columns={columnsExtrasWp}
-                                />
-                            </Tab>
-
-                            <Tab id='total-extras-simples' label='Total Extras Simples'>
-                                <VariationPanel
-                                    loading={loadingAlertsTotalExtrasSimples}
-                                    error={errorAlertsTotalExtrasSimples}
-                                    data={alertsDataTotalExtrasSimples}
-                                    columns={columnsTotalExtrasSimples}
-                                />
-                            </Tab>
-
-                            {/* Pendiente: el endpoint de recargo nocturno aun no existe en el backend.
-                            <Tab id='extras-nocturno' label='Extras Nocturno'>
-                                <VariationPanel
-                                    loading={loadingRecargoNocturno}
-                                    error={errorRecargoNocturno}
-                                    data={alertsDataRecargoNocturno}
-                                    columns={columnsRecargoNocturno}
-                                />
-                            </Tab> */}
-                        </Tabs>
+                        {groupBy === 'cuenta' ? (
+                            <CuentaReport payload={payload} />
+                        ) : (
+                            <RosterReport payload={payload} />
+                        )}
                     </div>
                 )}
             </div>
