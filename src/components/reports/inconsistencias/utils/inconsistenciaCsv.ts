@@ -1,5 +1,6 @@
 import { omniaApi } from '@/api'
 import { InconsistenciaRow } from '../types'
+import { calculateDifferenceHours } from '@/utils'
 
 // Helper: Generar contenido CSV con las columnas solicitadas
 export const generateCsvContent = (rows: InconsistenciaRow[]) => {
@@ -77,8 +78,12 @@ export const fetchAndParseCsv = async (
             intervaloHasta: item['Intervalo hasta'] || '',
             tipoDesconexion: item['Tipo de Desconexion'] || item['Tipo de Desconexión'] || '',
             motivo: item['Motivo'] || '',
+            codigoPuesto: item['Código Puesto'] || '',
+            legajoJefeInmediato: Number(item['Legajo Jefe Inmediato']) || 0,
+            puestoEmpleado: item['Puesto Empleado'] || '',
             codAutorizanteNivel1: employeeCode,
             codAutorizanteNivel2: codSupervisor,
+            tiempoDiferencia: calculateDifferenceHours(item['Ingreso'], item['Salida']),
         }
     })
 }

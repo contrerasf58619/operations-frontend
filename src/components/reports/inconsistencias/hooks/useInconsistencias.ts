@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 import { InconsistenciaRow } from '../types'
 import { SortingState } from '@tanstack/react-table'
@@ -6,11 +6,15 @@ import { useGetEmployeeCode } from '@/hooks'
 import dayjs from 'dayjs'
 import { omniaApi } from '@/api'
 import { fetchAndParseCsv, generateCsvContent } from '../utils/inconsistenciaCsv'
+import { useEmployeeContext } from '@/context/employee/EmployeeContext'
 
 export const useInconsistencias = () => {
     const { employeeCode } = useGetEmployeeCode()
+    const { employee } = useEmployeeContext()
 
-    const [reportType, setReportType] = useState<string>('horas.inconsistencias')
+    const name = `${employee?.employee.contacto.NOMBRE1} ${employee?.employee.contacto.APELLIDO1}`
+
+    const [reportType, setReportType] = useState<string>('horas.allied-inconsistencias')
     const [startDate, setStartDate] = useState<string>(
         dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
     )
@@ -25,6 +29,9 @@ export const useInconsistencias = () => {
     const [token, setToken] = useState('')
     const [authenticated, setAuthenticated] = useState(false)
     const [codSupervisor, setCodSupervisor] = useState<string>('')
+
+    const [legajosJefes, setLegajosJefes] = useState<number[]>([])
+    const [selectedJefe, setSelectedJefe] = useState<number | null>(null)
 
     // Fetch CODIGOSUPERVISOR on page load
     useEffect(() => {
@@ -128,8 +135,29 @@ export const useInconsistencias = () => {
         }
     }
 
+    const filterInconsistencias = (data: InconsistenciaRow[], typesInconsistencias: string[]) => {
+        return (
+            data
+                ?.filter(d => typesInconsistencias.includes(d.inconsistencia))
+                .sort((a, b) => b.tiempoDiferencia - a.tiempoDiferencia) || []
+        )
+    }
+
+    const extraerLegajosUnicos = (data: InconsistenciaRow[]) => {
+        const legajos = data
+            .map(item => Number(item.legajoJefeInmediato))
+            .filter(legajo => !isNaN(legajo) && legajo > 0)
+        return Array.from(new Set(legajos)).sort((a, b) => a - b)
+    }
+
+    const filteredData = useMemo(() => {
+        if (!selectedJefe || selectedJefe === 0) return data
+        return data.filter(row => Number(row.legajoJefeInmediato) === Number(selectedJefe))
+    }, [data, selectedJefe])
+
     // Handle search reports
     const handleSearchReports = async () => {
+        let tokenGenerate = token || ''
         if (startDate && endDate) {
             const diffDays = dayjs(endDate).diff(dayjs(startDate), 'day')
             if (diffDays < 0) {
@@ -145,9 +173,8 @@ export const useInconsistencias = () => {
         setLoading(true)
         setModifiedRows([])
         try {
-            if (!token) {
-                toast.error('No se pudo obtener la autenticación para el reporte')
-                return
+            if (!tokenGenerate) {
+                tokenGenerate = (await handleAuthenticate()) || ''
             }
 
             const response = await omniaApi.getReporte(
@@ -156,7 +183,7 @@ export const useInconsistencias = () => {
                     desde: startDate,
                     hasta: endDate,
                 },
-                token,
+                tokenGenerate,
             )
 
             const reportId = Number(response.data)
@@ -169,7 +196,10 @@ export const useInconsistencias = () => {
                 // Esperar 2 segundos entre intentos
                 await new Promise(resolve => setTimeout(resolve, 2000))
                 retries++
-                const statusResponse = await omniaApi.getReporteStatus({ id: reportId }, token)
+                const statusResponse = await omniaApi.getReporteStatus(
+                    { id: reportId },
+                    tokenGenerate,
+                )
                 const statusData = statusResponse.data
 
                 if (statusData.status === 'success') {
@@ -181,8 +211,11 @@ export const useInconsistencias = () => {
                         employeeCode || '',
                         codSupervisor || '',
                     )
-                    setData(rows)
-                    toast.success(`Se cargaron ${rows.length} registros`)
+                    const dataFilterByInconsistencia = filterInconsistencias(rows, ['HEI'])
+                    const legajosUnicos = extraerLegajosUnicos(dataFilterByInconsistencia)
+                    setLegajosJefes(legajosUnicos)
+                    setData(dataFilterByInconsistencia)
+                    toast.success(`Se cargaron ${dataFilterByInconsistencia.length} registros`)
                 } else if (statusData.status === 'failed' || statusData.status === 'error') {
                     throw new Error('El servidor no pudo generar el reporte')
                 }
@@ -209,7 +242,7 @@ export const useInconsistencias = () => {
         try {
             const csvContent = generateCsvContent(modifiedRows)
             const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-            const fileName = `Inconsistencias_Modificadas_${dayjs().format('YYYYMMDD_HHmmss')}.csv`
+            const fileName = `Inconsistencias_Modificadas_por_${name}_${dayjs().format('YYYYMMDD_HHmmss')}.csv`
             const file = new File([blob], fileName, { type: 'text/csv' })
             try {
                 const response = await omniaApi.postFile(file, token || undefined)
@@ -247,6 +280,7 @@ export const useInconsistencias = () => {
         startDate,
         endDate,
         data,
+        filteredData,
         modifiedRows,
         sorting,
         setSorting,
@@ -264,5 +298,8 @@ export const useInconsistencias = () => {
         handleSearchReports,
         handleSaveAll,
         setReportType,
+        legajosJefes,
+        selectedJefe,
+        setSelectedJefe,
     }
 }
