@@ -32,7 +32,10 @@ export const InconsistenciasTable = () => {
         const uniqueLegajos = new Set(
             filteredData
                 .map(item => item.legajo)
-                .filter(legajo => legajo !== undefined && legajo !== null && String(legajo).trim() !== ''),
+                .filter(
+                    legajo =>
+                        legajo !== undefined && legajo !== null && String(legajo).trim() !== '',
+                ),
         )
         return uniqueLegajos.size
     }, [filteredData])
@@ -42,22 +45,22 @@ export const InconsistenciasTable = () => {
         if (filteredData.length === 0) return
 
         const exportData = filteredData.map(row => ({
-            'Legajo': row.legajo,
-            'Documento': row.documento,
+            Legajo: row.legajo,
+            Documento: row.documento,
             'Nombre Completo': row.nombreCompleto,
-            'Fecha': row.fecha ? dayjs(row.fecha).format('DD/MM/YYYY') : '',
-            'Ingreso': row.ingreso || '',
-            'Salida': row.salida || '',
+            Fecha: row.fecha ? dayjs(row.fecha).format('DD/MM/YYYY') : '',
+            Ingreso: row.ingreso || '',
+            Salida: row.salida || '',
             'Tiempo Diferencia': row.tiempoDiferencia ?? '',
-            'Inconsistencia': row.inconsistencia,
-            'Descripción': row.descripcion,
+            Inconsistencia: row.inconsistencia,
+            Descripción: row.descripcion,
             'Intervalo Desde': row.intervaloDesde || '',
             'Intervalo Hasta': row.intervaloHasta || '',
             'Legajo Jefe Inmediato': row.legajoJefeInmediato ?? '',
             'Puesto Empleado': row.puestoEmpleado || '',
             'Código Puesto': row.codigoPuesto || '',
             'Tipo de Desconexión': row.tipoDesconexion || '',
-            'Motivo': row.motivo || '',
+            Motivo: row.motivo || '',
         }))
 
         const worksheet = XLSX.utils.json_to_sheet(exportData)
@@ -140,7 +143,9 @@ export const InconsistenciasTable = () => {
                     <div className='flex items-center gap-2'>
                         <div className='px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-medium flex items-center gap-2'>
                             <span className='text-gray-500'>Legajos únicos:</span>
-                            <span className='font-semibold text-gray-900'>{uniqueLegajosCount}</span>
+                            <span className='font-semibold text-gray-900'>
+                                {uniqueLegajosCount}
+                            </span>
                         </div>
                         <button
                             onClick={handleExportExcel}
@@ -148,8 +153,18 @@ export const InconsistenciasTable = () => {
                             className='px-3.5 py-2 bg-green-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
                             title='Exportar a Excel'
                         >
-                            <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' />
+                            <svg
+                                className='w-4 h-4'
+                                fill='none'
+                                viewBox='0 0 24 24'
+                                stroke='currentColor'
+                            >
+                                <path
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                    strokeWidth={2}
+                                    d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                                />
                             </svg>
                             Exportar Excel
                         </button>
