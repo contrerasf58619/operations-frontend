@@ -53,6 +53,14 @@ export const useInconsistenciasColumns = (
                 },
             },
             {
+                accessorKey: 'tiempoDiferencia',
+                header: 'Tiempo diferencia',
+                cell: ({ getValue }) => {
+                    const val = getValue() as string
+                    return val || '-'
+                },
+            },
+            {
                 accessorKey: 'inconsistencia',
                 header: 'Inconsistencia',
                 size: 120,
@@ -74,6 +82,33 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'intervaloHasta',
                 header: 'Intervalo Hasta',
+                size: 140,
+                cell: ({ getValue }) => {
+                    const val = getValue() as string
+                    return val || '-'
+                },
+            },
+            {
+                accessorKey: 'legajoJefeInmediato',
+                header: 'Legajo Jefe Inmediato',
+                size: 140,
+                cell: ({ getValue }) => {
+                    const val = getValue() as string
+                    return val || '-'
+                },
+            },
+            {
+                accessorKey: 'puestoEmpleado',
+                header: 'Puesto Empleado',
+                size: 140,
+                cell: ({ getValue }) => {
+                    const val = getValue() as string
+                    return val || '-'
+                },
+            },
+            {
+                accessorKey: 'codigoPuesto',
+                header: 'Código Puesto',
                 size: 140,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
