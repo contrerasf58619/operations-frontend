@@ -184,7 +184,7 @@ export const InconsistenciasTable = () => {
                                 {headerGroup.headers.map(header => (
                                     <th
                                         key={header.id}
-                                        className='text-sm font-semibold text-gray-700 px-4 py-3 cursor-pointer hover:bg-gray-50 select-none transition-colors border-r last:border-r-0 border-gray-200 whitespace-nowrap text-left'
+                                        className='text-sm font-semibold text-gray-700 px-2 py-2 cursor-pointer hover:bg-gray-50 select-none transition-colors border-r last:border-r-0 border-gray-200 whitespace-nowrap text-left'
                                         style={{ minWidth: header.column.columnDef.size }}
                                         onClick={header.column.getToggleSortingHandler()}
                                     >
@@ -229,7 +229,7 @@ export const InconsistenciasTable = () => {
                                     {row.getVisibleCells().map(cell => (
                                         <td
                                             key={cell.id}
-                                            className='px-4 py-2.5 text-sm text-gray-600 border-r last:border-r-0 border-gray-100'
+                                            className='px-2 py-1 text-sm text-gray-600 border-r last:border-r-0 border-gray-100'
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,

@@ -16,14 +16,9 @@ export const useInconsistenciasColumns = (
                 size: 80,
             },
             {
-                accessorKey: 'documento',
-                header: 'Documento',
-                size: 100,
-            },
-            {
                 accessorKey: 'nombreCompleto',
-                header: 'Nombre Completo',
-                size: 180,
+                header: 'Nombre',
+                size: 135,
             },
             {
                 accessorKey: 'fecha',
@@ -37,7 +32,7 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'ingreso',
                 header: 'Ingreso',
-                size: 140,
+                size: 110,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -46,7 +41,7 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'salida',
                 header: 'Salida',
-                size: 140,
+                size: 110,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -54,7 +49,8 @@ export const useInconsistenciasColumns = (
             },
             {
                 accessorKey: 'tiempoDiferencia',
-                header: 'Tiempo diferencia',
+                header: 'Missing time',
+                size: 80,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -63,17 +59,17 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'inconsistencia',
                 header: 'Inconsistencia',
-                size: 120,
+                size: 80,
             },
             {
                 accessorKey: 'descripcion',
                 header: 'Descripción',
-                size: 200,
+                size: 140,
             },
             {
                 accessorKey: 'intervaloDesde',
                 header: 'Intervalo Desde',
-                size: 140,
+                size: 110,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -82,7 +78,7 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'intervaloHasta',
                 header: 'Intervalo Hasta',
-                size: 140,
+                size: 110,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -90,8 +86,8 @@ export const useInconsistenciasColumns = (
             },
             {
                 accessorKey: 'legajoJefeInmediato',
-                header: 'Legajo Jefe Inmediato',
-                size: 140,
+                header: 'Jefe Inmediato',
+                size: 100,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -100,15 +96,6 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'puestoEmpleado',
                 header: 'Puesto Empleado',
-                size: 140,
-                cell: ({ getValue }) => {
-                    const val = getValue() as string
-                    return val || '-'
-                },
-            },
-            {
-                accessorKey: 'codigoPuesto',
-                header: 'Código Puesto',
                 size: 140,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
@@ -136,7 +123,7 @@ export const useInconsistenciasColumns = (
             {
                 accessorKey: 'motivo',
                 header: 'Motivo',
-                size: 220,
+                size: 180,
                 cell: ({ row }) => (
                     <input
                         type='text'
