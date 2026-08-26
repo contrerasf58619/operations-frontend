@@ -30,7 +30,7 @@ export const pdfCache = {
         if (typeof window === 'undefined' || !window.indexedDB) return null
         try {
             const db = await openDB()
-            return new Promise((resolve, reject) => {
+            return new Promise(resolve => {
                 const tx = db.transaction(STORE_NAME, 'readonly')
                 const store = tx.objectStore(STORE_NAME)
                 const request = store.get(key)
@@ -64,7 +64,7 @@ export const pdfCache = {
         if (typeof window === 'undefined' || !window.indexedDB) return
         try {
             const db = await openDB()
-            return new Promise((resolve, reject) => {
+            return new Promise(resolve => {
                 const tx = db.transaction(STORE_NAME, 'readwrite')
                 const store = tx.objectStore(STORE_NAME)
                 const request = store.put(blob, key)

@@ -20,17 +20,14 @@ const Manuales: React.FC = () => {
     return (
         <div className='min-h-screen'>
             <div className='max-w-full mx-auto space-y-6'>
-               {/* Table View */}
+                {/* Table View */}
                 <ManualesTable data={MANUALES_DATA} onView={handleViewManual} />
             </div>
 
             {/* Fullscreen PDF Modal */}
-            {selectedManual && (
-                <PdfViewer manual={selectedManual} onClose={handleCloseViewer} />
-            )}
+            {selectedManual && <PdfViewer manual={selectedManual} onClose={handleCloseViewer} />}
         </div>
     )
 }
 
 export default Manuales
-

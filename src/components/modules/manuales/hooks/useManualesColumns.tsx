@@ -15,12 +15,13 @@ export const useManualesColumns = (onView: (manual: Manual) => void) => {
                     return (
                         <div className='flex items-center gap-3 py-1'>
                             <div className='min-w-0'>
-                                <span
-                                    className='font-semibold text-gray-900 block text-sm leading-tight hover:text-blue-600 transition-colors cursor-pointer'
+                                <button
+                                    type='button'
+                                    className='font-semibold text-gray-900 text-sm leading-tight hover:text-blue-600 transition-colors cursor-pointer text-left'
                                     onClick={() => onView(manual)}
                                 >
                                     {manual.name}
-                                </span>
+                                </button>
                             </div>
                         </div>
                     )

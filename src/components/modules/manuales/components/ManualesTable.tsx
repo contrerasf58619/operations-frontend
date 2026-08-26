@@ -58,14 +58,14 @@ export const ManualesTable: React.FC<ManualesTableProps> = ({ data, onView }) =>
         <div className='bg-white'>
             {/* Search and Category Filter Bar */}
             <div className='flex flex-col md:flex-row gap-4 items-stretch md:items-end justify-between'>
-                 {/* Header */}
+                {/* Header */}
                 <div>
                     <h1 className='text-3xl font-bold text-gray-900'>Manuales</h1>
                     <p className='text-gray-500 text-sm mt-1'>
                         Consulta y visualiza los manuales de procedimientos operativos
                     </p>
                 </div>
-                
+
                 {/* Search Input */}
                 <div className='relative flex-1 max-w-md'>
                     <div className='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none'>
@@ -88,7 +88,6 @@ export const ManualesTable: React.FC<ManualesTableProps> = ({ data, onView }) =>
                     )}
                 </div>
             </div>
-            
 
             {/* Category Pills & Count */}
             <div className='py-4 flex items-center gap-2 flex-wrap'>
@@ -117,7 +116,6 @@ export const ManualesTable: React.FC<ManualesTableProps> = ({ data, onView }) =>
                     </span>
                 </div>
             </div>
-
 
             {/* Table */}
             <div className='overflow-x-auto'>
@@ -184,7 +182,8 @@ export const ManualesTable: React.FC<ManualesTableProps> = ({ data, onView }) =>
                                             No se encontraron manuales
                                         </p>
                                         <p className='text-gray-400 text-xs'>
-                                            Intenta con otros términos de búsqueda o selecciona otra categoría
+                                            Intenta con otros términos de búsqueda o selecciona otra
+                                            categoría
                                         </p>
                                         {(globalFilter || selectedCategory !== 'Todas') && (
                                             <button

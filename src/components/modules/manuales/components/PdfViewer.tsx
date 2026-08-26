@@ -43,8 +43,10 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ manual, onClose }) => {
             style={{ animation: 'pdfModalFadeIn 0.2s ease-out' }}
         >
             {/* Backdrop */}
-            <div
-                className='absolute inset-0 bg-black/60 backdrop-blur-sm'
+            <button
+                type='button'
+                aria-label='Cerrar visualizador'
+                className='absolute inset-0 bg-black/60 backdrop-blur-sm w-full h-full border-0 cursor-default'
                 onClick={onClose}
             />
 
@@ -95,7 +97,9 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ manual, onClose }) => {
                             title='Actualizar y forzar nueva descarga desde el servidor'
                             className='flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-gray-300 hover:text-white hover:bg-gray-700 disabled:opacity-50 rounded-lg transition-all text-xs sm:text-sm font-medium cursor-pointer'
                         >
-                            <LuRefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${loading ? 'animate-spin' : ''}`} />
+                            <LuRefreshCw
+                                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${loading ? 'animate-spin' : ''}`}
+                            />
                             <span className='hidden md:inline'>Actualizar</span>
                         </button>
 
@@ -162,9 +166,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ manual, onClose }) => {
                             <h3 className='text-base font-semibold text-gray-800'>
                                 No se pudo cargar el manual
                             </h3>
-                            <p className='text-sm text-gray-500'>
-                                {error}
-                            </p>
+                            <p className='text-sm text-gray-500'>{error}</p>
                             <button
                                 onClick={reload}
                                 className='mt-2 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-all cursor-pointer shadow-sm'
