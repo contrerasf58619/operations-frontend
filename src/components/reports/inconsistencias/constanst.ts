@@ -1,0 +1,30 @@
+export const REPORT_TYPES = [
+    { value: 'horas.allied-inconsistencias', label: 'Horas Inconsistencias' },
+]
+
+export const TIPOS_DESCONEXION = [
+    { value: '', label: 'Seleccionar opción' },
+    { value: '0-30 Days', label: '0-30 Days' },
+    { value: 'Baja', label: 'Baja' },
+    { value: 'Balance*', label: 'Balance*' },
+    { value: 'Breastfeeding', label: 'Breastfeeding' },
+    { value: 'Feedback', label: 'Feedback' },
+    { value: 'HR Hearing', label: 'HR Hearing' },
+    { value: 'IAK', label: 'IAK' },
+    { value: 'License Issues*', label: 'License Issues*' },
+    { value: 'Low Production', label: 'Low Production' },
+    { value: 'Mentor Request', label: 'Mentor Request' },
+    { value: 'Non-Billable Hours', label: 'Non-Billable Hours' },
+    { value: 'Overlap', label: 'Overlap' },
+    { value: 'PIP Notification', label: 'PIP Notification' },
+    { value: 'Prom', label: 'Prom' },
+    { value: 'QA Disconnection', label: 'QA Disconnection' },
+    { value: 'Shadow', label: 'Shadow' },
+    { value: 'Shift Swap Notification', label: 'Shift Swap Notification' },
+    { value: 'System Outage*', label: 'System Outage*' },
+    { value: 'Training', label: 'Training' },
+    { value: 'Work Station Issues*', label: 'Work Station Issues*' },
+    { value: 'COVID-19', label: 'COVID-19' },
+    { value: 'Top Performers', label: 'Top Performers' },
+    { value: 'Free Pass', label: 'Free Pass' },
+]
