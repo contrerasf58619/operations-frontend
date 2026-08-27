@@ -54,5 +54,16 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/login'], // Add all protected routes here
+    matcher: [
+        '/',
+        '/login',
+        '/assets/manuales',
+        '/reports/general',
+        '/reports/conexion-neta',
+        '/reports/alerts',
+        '/reports/quincenal',
+        '/attendances/take-attendance',
+        '/attendances/inconsistencias',
+        '/feedback/feedback-report',
+    ], // Add all protected routes here
 }
