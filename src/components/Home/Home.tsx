@@ -2,7 +2,8 @@
 
 import { getInitials } from '@/utils/getInitials'
 import { useEmployeeContext } from '@/context/employee/EmployeeContext'
-import Link from 'next/link'
+import { useSidebarContext } from '@/context/sidebar/SideBarContex'
+import { SideBarMenuParent } from '../UI/SideBar/SideBarMenuParent'
 // import { TopBar } from '../UI/TopBar/TopBar'
 
 export type UserSummary = {
@@ -15,6 +16,7 @@ export type UserSummary = {
 
 export const Home = () => {
     const { employee } = useEmployeeContext()
+    const { sidebarState } = useSidebarContext()
 
     const name = `${employee?.employee.contacto.NOMBRE1} ${employee?.employee.contacto.APELLIDO1}`
 
@@ -68,12 +70,11 @@ export const Home = () => {
                         <div className='rounded-2xl border border-gray-200 bg-white p-5'>
                             <h3 className='font-semibold mb-3'>Quick actions</h3>
                             <div className='grid grid-cols-1 gap-3 text-sm'>
-                                <Link
-                                    href='/attendances/take-attendance'
-                                    className='rounded-xl border border-gray-200 px-4 py-3 hover:border-[#0FA3B1]'
-                                >
-                                    Take Attendance
-                                </Link>
+                                <ul className='space-y-2' key='main-menu'>
+                                    {sidebarState.parents.map((parent: any) => (
+                                        <SideBarMenuParent key={parent.name} parent={parent} />
+                                    ))}
+                                </ul>
                             </div>
                         </div>
                     </section>
