@@ -1,15 +1,6 @@
 import React, { useEffect } from 'react'
 import { Manual } from '../interfaces/manual.interface'
-import {
-    LuArrowLeft,
-    LuCircleAlert,
-    LuDownload,
-    LuExternalLink,
-    LuLoaderCircle,
-    LuRefreshCw,
-    LuX,
-    LuZap,
-} from 'react-icons/lu'
+import { LuArrowLeft, LuCircleAlert, LuLoaderCircle, LuRefreshCw, LuX, LuZap } from 'react-icons/lu'
 import { useCachedPdf } from '../hooks/useCachedPdf'
 
 interface PdfViewerProps {
@@ -90,44 +81,6 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ manual, onClose }) => {
                     </div>
 
                     <div className='flex items-center gap-1 sm:gap-2 shrink-0'>
-                        {/* Reload / Refresh Cache button */}
-                        <button
-                            onClick={reload}
-                            disabled={loading}
-                            title='Actualizar y forzar nueva descarga desde el servidor'
-                            className='flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-gray-300 hover:text-white hover:bg-gray-700 disabled:opacity-50 rounded-lg transition-all text-xs sm:text-sm font-medium cursor-pointer'
-                        >
-                            <LuRefreshCw
-                                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${loading ? 'animate-spin' : ''}`}
-                            />
-                            <span className='hidden md:inline'>Actualizar</span>
-                        </button>
-
-                        {/* Open in new tab */}
-                        {pdfUrl && (
-                            <a
-                                href={pdfUrl}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all text-xs sm:text-sm font-medium'
-                            >
-                                <LuExternalLink className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
-                                <span className='hidden sm:inline'>Abrir</span>
-                            </a>
-                        )}
-
-                        {/* Direct Download */}
-                        {pdfUrl && (
-                            <a
-                                href={pdfUrl}
-                                download={`${manual.name}.pdf`}
-                                className='flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all text-xs sm:text-sm font-medium'
-                            >
-                                <LuDownload className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
-                                <span className='hidden sm:inline'>Descargar</span>
-                            </a>
-                        )}
-
                         <button
                             onClick={onClose}
                             className='p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all cursor-pointer'
@@ -179,7 +132,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ manual, onClose }) => {
 
                     {!loading && !error && pdfUrl && (
                         <iframe
-                            src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1`}
+                            src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                             title={manual.name}
                             className='w-full h-full border-0'
                         />
