@@ -25,6 +25,9 @@ export const InconsistenciasTable = () => {
         legajosJefes,
         selectedJefe,
         setSelectedJefe,
+        availableInconsistencias,
+        selectedInconsistencias,
+        setSelectedInconsistencias,
     } = useInconsistenciasContext()
 
     // Count unique legajos in filteredData
@@ -135,6 +138,34 @@ export const InconsistenciasTable = () => {
                         {legajosJefes.map(legajo => (
                             <option key={legajo} value={legajo}>
                                 {legajo}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className='flex flex-col min-w-[200px]'>
+                    <label className='block text-sm font-semibold text-gray-900 mb-2'>
+                        Filtrar por inconsistencias
+                    </label>
+                    <select
+                        value={
+                            selectedInconsistencias.length === availableInconsistencias.length ||
+                            selectedInconsistencias.length === 0
+                                ? 'Todos'
+                                : selectedInconsistencias[0]
+                        }
+                        onChange={e => {
+                            if (e.target.value === 'Todos') {
+                                setSelectedInconsistencias(availableInconsistencias)
+                            } else {
+                                setSelectedInconsistencias([e.target.value])
+                            }
+                        }}
+                        className='w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors'
+                    >
+                        <option value='Todos'>Todos</option>
+                        {availableInconsistencias.map(inc => (
+                            <option key={inc} value={inc}>
+                                {inc}
                             </option>
                         ))}
                     </select>
