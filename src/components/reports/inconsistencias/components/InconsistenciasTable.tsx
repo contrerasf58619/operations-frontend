@@ -143,10 +143,14 @@ export const InconsistenciasTable = () => {
                     </select>
                 </div>
                 <div className='flex flex-col min-w-[200px]'>
-                    <label className='block text-sm font-semibold text-gray-900 mb-2'>
+                    <label
+                        htmlFor='inconsistenciasFilter'
+                        className='block text-sm font-semibold text-gray-900 mb-2'
+                    >
                         Filtrar por inconsistencias
                     </label>
                     <select
+                        id='inconsistenciasFilter'
                         value={
                             selectedInconsistencias.length === availableInconsistencias.length ||
                             selectedInconsistencias.length === 0

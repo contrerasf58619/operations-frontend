@@ -216,9 +216,14 @@ export const useInconsistencias = () => {
                         employeeCode || '',
                         codSupervisor || '',
                     )
-                    const sortedRows = rows.sort((a, b) => b.tiempoDiferencia - a.tiempoDiferencia)
+                    const sortedRows = rows.sort(
+                        (a: { tiempoDiferencia: number }, b: { tiempoDiferencia: number }) =>
+                            b.tiempoDiferencia - a.tiempoDiferencia,
+                    )
                     const uniqueInc = Array.from(
-                        new Set(sortedRows.map(r => r.inconsistencia)),
+                        new Set(
+                            sortedRows.map((r: { inconsistencia: string }) => r.inconsistencia),
+                        ),
                     ).filter(Boolean) as string[]
                     setAvailableInconsistencias(uniqueInc)
                     setSelectedInconsistencias(uniqueInc)
