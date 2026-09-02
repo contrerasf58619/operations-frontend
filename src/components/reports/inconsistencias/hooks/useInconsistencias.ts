@@ -32,6 +32,8 @@ export const useInconsistencias = () => {
 
     const [legajosJefes, setLegajosJefes] = useState<number[]>([])
     const [selectedJefe, setSelectedJefe] = useState<number | null>(null)
+    const [availableInconsistencias, setAvailableInconsistencias] = useState<string[]>([])
+    const [selectedInconsistencias, setSelectedInconsistencias] = useState<string[]>([])
 
     // Fetch CODIGOSUPERVISOR on page load
     useEffect(() => {
@@ -135,14 +137,6 @@ export const useInconsistencias = () => {
         }
     }
 
-    const filterInconsistencias = (data: InconsistenciaRow[], typesInconsistencias: string[]) => {
-        return (
-            data
-                ?.filter(d => typesInconsistencias.includes(d.inconsistencia))
-                .sort((a, b) => b.tiempoDiferencia - a.tiempoDiferencia) || []
-        )
-    }
-
     const extraerLegajosUnicos = (data: InconsistenciaRow[]) => {
         const legajos = data
             .map(item => Number(item.legajoJefeInmediato))
@@ -151,9 +145,20 @@ export const useInconsistencias = () => {
     }
 
     const filteredData = useMemo(() => {
-        if (!selectedJefe || selectedJefe === 0) return data
-        return data.filter(row => Number(row.legajoJefeInmediato) === Number(selectedJefe))
-    }, [data, selectedJefe])
+        let result = data
+
+        if (selectedInconsistencias.length > 0) {
+            result = result.filter(row => selectedInconsistencias.includes(row.inconsistencia))
+        } else {
+            result = []
+        }
+
+        if (selectedJefe && selectedJefe !== 0) {
+            result = result.filter(row => Number(row.legajoJefeInmediato) === Number(selectedJefe))
+        }
+
+        return result
+    }, [data, selectedJefe, selectedInconsistencias])
 
     // Handle search reports
     const handleSearchReports = async () => {
@@ -211,11 +216,17 @@ export const useInconsistencias = () => {
                         employeeCode || '',
                         codSupervisor || '',
                     )
-                    const dataFilterByInconsistencia = filterInconsistencias(rows, ['HEI'])
-                    const legajosUnicos = extraerLegajosUnicos(dataFilterByInconsistencia)
+                    const sortedRows = rows.sort((a, b) => b.tiempoDiferencia - a.tiempoDiferencia)
+                    const uniqueInc = Array.from(
+                        new Set(sortedRows.map(r => r.inconsistencia)),
+                    ).filter(Boolean) as string[]
+                    setAvailableInconsistencias(uniqueInc)
+                    setSelectedInconsistencias(uniqueInc)
+
+                    const legajosUnicos = extraerLegajosUnicos(sortedRows)
                     setLegajosJefes(legajosUnicos)
-                    setData(dataFilterByInconsistencia)
-                    toast.success(`Se cargaron ${dataFilterByInconsistencia.length} registros`)
+                    setData(sortedRows)
+                    toast.success(`Se cargaron ${sortedRows.length} registros`)
                 } else if (statusData.status === 'failed' || statusData.status === 'error') {
                     throw new Error('El servidor no pudo generar el reporte')
                 }
@@ -301,5 +312,8 @@ export const useInconsistencias = () => {
         legajosJefes,
         selectedJefe,
         setSelectedJefe,
+        availableInconsistencias,
+        selectedInconsistencias,
+        setSelectedInconsistencias,
     }
 }
