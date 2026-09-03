@@ -54,5 +54,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/', '/login'], // Add all protected routes here
+    matcher: ['/', '/login', '/security/otp'], // Add all protected routes here
 }
