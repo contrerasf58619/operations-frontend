@@ -26,14 +26,14 @@ async function redirectToLogin() {
 
 // Handle successful responses whose body contains status 401
 axios.interceptors.response.use(
-    (response) => {
+    response => {
         if (response.data?.status === 401) {
             redirectToLogin()
             return Promise.reject(new Error('Unauthorized'))
         }
         return response
     },
-    (error) => {
+    error => {
         // Handle HTTP 401 status codes
         if (error.response?.status === 401) {
             redirectToLogin()
