@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
 
     // Public paths that don't require authentication
     const publicPaths = ['/login', '/forgot-password', '/register']
-    const isPublicPath = publicPaths.some((path) => pathname === path)
+    const isPublicPath = publicPaths.some(path => pathname === path)
 
     if (token) {
         try {
