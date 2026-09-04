@@ -1,11 +1,8 @@
 import { Metadata } from 'next'
 import '@/app/globals.css'
-import { ToastProvider } from '@/context/UI/ToastNotificationContext'
-import { AuthProvider } from '@/context/auth/AuthContext'
-
 import { alliedLogoSVG } from '@/assets'
-import { NextIntlClientProvider } from 'next-intl'
 import { getLocale } from 'next-intl/server'
+import { Providers } from '@/app/providers'
 
 export const metadata: Metadata = {
     title: 'ATS - Allied Global',
@@ -19,11 +16,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     return (
         <html lang={locale} suppressHydrationWarning>
             <body suppressHydrationWarning>
-                <NextIntlClientProvider>
-                    <ToastProvider>
-                        <AuthProvider>{children}</AuthProvider>
-                    </ToastProvider>
-                </NextIntlClientProvider>
+                <Providers locale={locale}>{children}</Providers>
             </body>
         </html>
     )
