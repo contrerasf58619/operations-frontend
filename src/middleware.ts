@@ -19,6 +19,10 @@ export async function middleware(req: NextRequest) {
     const loginPagePath = '/login'
     const homePagePath = '/'
 
+    // Public paths that don't require authentication
+    const publicPaths = ['/login', '/forgot-password', '/register']
+    const isPublicPath = publicPaths.some(path => pathname === path)
+
     if (token) {
         try {
             // Decode the token to check if it has expired
@@ -26,32 +30,30 @@ export async function middleware(req: NextRequest) {
 
             // If the token has expired, redirect to the login page
             if (decodedToken && decodedToken.exp * 1000 < Date.now()) {
-                const response =
-                    pathname !== loginPagePath
-                        ? NextResponse.redirect(new URL(loginPagePath, req.url))
-                        : NextResponse.next()
+                const response = !isPublicPath
+                    ? NextResponse.redirect(new URL(loginPagePath, req.url))
+                    : NextResponse.next()
                 response.cookies.delete('access_token')
                 return response
             }
 
-            // If the token is valid and not expired
-            if (pathname === loginPagePath) {
+            // If the token is valid and not expired, redirect away from public pages
+            if (isPublicPath) {
                 return NextResponse.redirect(new URL(homePagePath, req.url))
             }
             return NextResponse.next()
         } catch (error) {
-            console.log(error)
+            console.log(error, 'asss')
             // If there's an error decoding the token, redirect to the login page
-            const response =
-                pathname !== loginPagePath
-                    ? NextResponse.redirect(new URL(loginPagePath, req.url))
-                    : NextResponse.next()
+            const response = !isPublicPath
+                ? NextResponse.redirect(new URL(loginPagePath, req.url))
+                : NextResponse.next()
             response.cookies.delete('access_token')
             return response
         }
     } else {
-        // If there's no token, redirect to login page for all routes except login
-        if (pathname !== loginPagePath) {
+        // If there's no token, allow public paths and redirect everything else to login
+        if (!isPublicPath) {
             return NextResponse.redirect(new URL(loginPagePath, req.url))
         }
         return NextResponse.next()
