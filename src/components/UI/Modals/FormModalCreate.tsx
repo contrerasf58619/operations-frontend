@@ -44,12 +44,10 @@ export const FormModal = ({
             </CustomButton>
 
             {isOpen && (
-                <div className='fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-gray-900 bg-opacity-50'>
-                    <div className='relative p-6 w-full max-w-4xl bg-white rounded-2xl shadow-lg dark:bg-gray-700'>
-                        <div className='flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600 border-gray-200'>
-                            <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
-                                {title}
-                            </h3>
+                <div className='fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-gray-900/50'>
+                    <div className='relative w-full max-w-md rounded-2xl bg-white p-6 shadow-lg'>
+                        <div className='flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-600'>
+                            <h3 className='text-lg font-semibold text-gray-900'>{title}</h3>
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className='text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white'
@@ -84,13 +82,13 @@ export const FormModal = ({
                         >
                             {({ isSubmitting, values }) => (
                                 <Form className='w-full px-6 py-4'>
-                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4'>
+                                    <div className='grid grid-cols-1 gap-4'>
                                         {fields
                                             .filter(({ shouldRender }) =>
                                                 shouldRender ? shouldRender(values) : true,
                                             )
                                             .map(({ name, label, type = 'text', component }) => (
-                                                <div key={name} className='mb-4'>
+                                                <div key={name} className='flex flex-col gap-2'>
                                                     <label className='block text-sm font-medium text-gray-700'>
                                                         {label}
                                                     </label>
@@ -100,7 +98,7 @@ export const FormModal = ({
                                                         <Field
                                                             type={type}
                                                             name={name}
-                                                            className='input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-600 focus:ring focus:ring-opacity-40 focus:ring-indigo-500 input-field'
+                                                            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100/20 dark:border-gray-100 dark:bg-gray-300 dark:text-white'
                                                         />
                                                     )}
                                                     <ErrorMessage
