@@ -27,6 +27,7 @@
         "next-i18next": "^15.4.3",
         "next-intl": "^4.3.9",
         "primereact": "^10.9.7",
+        "qrcode.react": "^4.2.0",
         "react": "19.1.0",
         "react-datepicker": "^9.1.0",
         "react-dom": "19.1.0",
