@@ -8,11 +8,8 @@ export const InconsistenciasFilter = () => {
         startDate,
         endDate,
         loading,
-        authenticated,
-        authLoading,
         handleStartDateChange,
         handleEndDateChange,
-        handleAuthenticate,
         handleSearchReports,
         setReportType,
     } = useInconsistenciasContext()
@@ -113,52 +110,6 @@ export const InconsistenciasFilter = () => {
                             </svg>
                         )}
                         {loading ? 'Buscando...' : 'Buscar reportes'}
-                    </button>
-                </div>
-
-                {/* Autenticarse Button */}
-                <div className='flex flex-col'>
-                    <button
-                        disabled={authenticated || authLoading}
-                        onClick={handleAuthenticate}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm transition-colors ${
-                            authenticated
-                                ? 'bg-green-100 text-green-800 border border-green-300 cursor-default'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 active:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
-                        }`}
-                    >
-                        {authLoading ? (
-                            <div className='w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin' />
-                        ) : authenticated ? (
-                            <svg
-                                className='w-4 h-4 text-green-600'
-                                fill='none'
-                                stroke='currentColor'
-                                viewBox='0 0 24 24'
-                            >
-                                <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth='2'
-                                    d='M5 13l4 4L19 7'
-                                />
-                            </svg>
-                        ) : (
-                            <svg
-                                className='w-4 h-4'
-                                fill='none'
-                                stroke='currentColor'
-                                viewBox='0 0 24 24'
-                            >
-                                <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                    strokeWidth='2'
-                                    d='M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z'
-                                />
-                            </svg>
-                        )}
-                        {authenticated ? 'Autenticado en Omnia' : 'Autenticarse en omnia'}
                     </button>
                 </div>
             </div>

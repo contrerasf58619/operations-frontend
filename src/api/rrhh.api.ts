@@ -72,4 +72,10 @@ export const rrhhApi = {
             params: { employeeCode: code },
         })
     },
+
+    getSignedUrl(s3Key: string) {
+        const route = `${api}rrhh/backoffice-baja/file/get-signed-url`
+
+        return axios.get(route, { headers: getHeaders(), params: { s3Key } })
+    },
 }

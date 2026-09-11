@@ -6,6 +6,7 @@ import Cookies from 'js-cookie'
 
 import { awsOperationApi } from '@/api/aws.operation.api'
 import { useToastContext } from '../UI/ToastNotificationContext'
+import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth'
 
 interface ContextProps {
     showPassword: boolean
@@ -33,11 +34,17 @@ export const AuthProvider: FC<React.PropsWithChildren> = ({ children }) => {
 
     const handleLogin = async (username: string, password: string) => {
         try {
-            const resp = await awsOperationApi.login({ username, password })
+            const cognito = await signIn({
+                username,
+                password,
+            })
 
-            if (resp.data.status) {
-                Cookies.set('access_token', resp.data.data.token)
-                Cookies.set('employeeCode', resp.data.data.user.employeeCode)
+            if (cognito.isSignedIn) {
+                const { tokens } = await fetchAuthSession()
+                const accessToken = tokens?.idToken?.toString() || ''
+                const employeeCode = tokens?.idToken?.payload?.['custom:code'] || ''
+                Cookies.set('access_token', accessToken)
+                Cookies.set('employeeCode', String(employeeCode))
 
                 router.push('/')
             } else {
@@ -51,19 +58,14 @@ export const AuthProvider: FC<React.PropsWithChildren> = ({ children }) => {
 
     const handleLogout = async () => {
         try {
-            const resp = await awsOperationApi.logout()
-
-            if (resp.data.status) {
-                Cookies.remove('access_token')
-                Cookies.remove('employeeCode')
-
-                router.push('/login')
-            }
+            await signOut()
+            Cookies.remove('access_token')
+            Cookies.remove('employeeCode')
+            router.push('/login')
         } catch (error) {
             console.log('Error during logout: ', error)
             Cookies.remove('access_token')
             Cookies.remove('employeeCode')
-
             router.push('/login')
         }
     }
