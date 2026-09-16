@@ -42,7 +42,10 @@ export const AuthProvider: FC<React.PropsWithChildren> = ({ children }) => {
             if (cognito.isSignedIn) {
                 const { tokens } = await fetchAuthSession()
                 const accessToken = tokens?.idToken?.toString() || ''
-                const employeeCode = tokens?.idToken?.payload?.['custom:code'] || ''
+                const employeeCode =
+                    tokens?.idToken?.payload?.['custom:code'] ||
+                    tokens?.idToken?.payload?.['custom:employee_code'] ||
+                    ''
                 Cookies.set('access_token', accessToken)
                 Cookies.set('employeeCode', String(employeeCode))
 
