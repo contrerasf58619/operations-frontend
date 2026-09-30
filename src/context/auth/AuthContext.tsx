@@ -34,6 +34,7 @@ export const AuthProvider: FC<React.PropsWithChildren> = ({ children }) => {
 
     const handleLogin = async (username: string, password: string) => {
         try {
+            await signOut()
             const cognito = await signIn({
                 username,
                 password,
