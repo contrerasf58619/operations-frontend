@@ -65,11 +65,10 @@ export interface ResponseApi {
 }
 
 export const rrhhApi = {
-    getEmployeeByCode(code: string) {
-        const route = baseURL(api, `rrhh/empleado/${code}`)
+    getMyData() {
+        const route = baseURL(api, `rrhh/empleado/my-data`)
         return axios.get<ResponseApi>(route, {
             headers: getHeaders(),
-            params: { employeeCode: code },
         })
     },
 
