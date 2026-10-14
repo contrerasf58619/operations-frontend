@@ -50,7 +50,7 @@ export const ForgotPassword = () => {
             title='Forgot password'
             subtitle='Enter your username and email to receive reset instructions'
         >
-            <form onSubmit={formik.handleSubmit} className='grid gap-5'>
+            <form method='POST' onSubmit={formik.handleSubmit} className='grid gap-5'>
                 {/* Username */}
                 <label className='grid gap-2'>
                     <span className='text-sm text-gray-700'>Username</span>
