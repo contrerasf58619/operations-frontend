@@ -87,7 +87,7 @@ export const omniaApi = {
 
     getCsvData(payload: { url: string; delimiter: string }) {
         const route = baseURL(apiUadNest, 'csv/data')
-        return axios.post<any>(route, payload)
+        return axios.post<any>(route, payload, { headers: getHeaders() })
     },
 
     postFile(payload: OmniaPostFilePayload | File | Blob, token?: string) {
