@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { baseURL } from './baseURL'
+import { getHeaders } from '@/utils'
 
 const api = process.env.NEXT_PUBLIC_URL_OMNIA_ADMIN
 const apiUadNest = process.env.NEXT_PUBLIC_URL_UAD_NEST
@@ -105,6 +106,8 @@ export const omniaApi = {
 
     getDataByEmployeeCode(code: string) {
         const route = baseURL(apiUadNest, `rrhh/empleado/get-data-by-employee-code/${code}`)
-        return axios.get<any>(route)
+        return axios.get<any>(route, {
+            headers: getHeaders(),
+        })
     },
 }
