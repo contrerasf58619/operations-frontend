@@ -51,7 +51,7 @@ export const Register = () => {
 
     return (
         <AuthLayout title='Create account' subtitle='Provide your details to get started'>
-            <form onSubmit={formik.handleSubmit} className='grid gap-5'>
+            <form method='POST' onSubmit={formik.handleSubmit} className='grid gap-5'>
                 {/* DPI */}
                 <label className='grid gap-2'>
                     <span className='text-sm text-gray-700'>DPI</span>

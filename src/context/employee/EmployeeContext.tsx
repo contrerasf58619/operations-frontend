@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react'
 import { useGetEmployeeCode } from '@/hooks'
-import { useEmployeeByCode } from '@/hooks/useRrhh'
+import { useMyData } from '@/hooks/useRrhh'
 
 interface EmployeeContextProps {
     employeeCode: string | undefined
@@ -15,12 +15,18 @@ interface EmployeeContextProps {
 const EmployeeContext = createContext<EmployeeContextProps | undefined>(undefined)
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
+    const { employee, loading, error } = useMyData()
     const { employeeCode, setEmployeeCode } = useGetEmployeeCode()
-    const { employee, loading, error } = useEmployeeByCode(employeeCode)
 
     return (
         <EmployeeContext.Provider
-            value={{ employeeCode, setEmployeeCode, employee, loading, error }}
+            value={{
+                employeeCode,
+                setEmployeeCode,
+                employee,
+                loading,
+                error,
+            }}
         >
             {children}
         </EmployeeContext.Provider>
