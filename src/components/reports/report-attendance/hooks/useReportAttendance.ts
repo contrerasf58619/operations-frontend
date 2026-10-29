@@ -66,7 +66,6 @@ export const useReportAttendance = () => {
                     asistencia: item.asistencia ?? item.attendance_type ?? '',
                     pase: item.pase ?? '',
                     ajuste: item.ajuste ?? '',
-                    asistencia_final: item.asistencia_final ?? '',
                 }),
             )
 
@@ -91,7 +90,6 @@ export const useReportAttendance = () => {
                 Asistencia: row.asistencia || '',
                 Pase: row.pase || '',
                 Ajuste: row.ajuste || '',
-                'Asistencia final': row.asistencia_final || '',
             }))
 
             const worksheet = XLSX.utils.json_to_sheet(exportData)

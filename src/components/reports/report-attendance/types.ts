@@ -5,5 +5,4 @@ export interface ReportAttendanceRow {
     asistencia: string
     pase: string
     ajuste: string
-    asistencia_final: string
 }
