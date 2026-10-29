@@ -24,10 +24,7 @@ export const ReportAttendanceFilter = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
             {/* UAD */}
             <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-                <label
-                    htmlFor='uad'
-                    className='block text-sm font-semibold text-gray-900 mb-4'
-                >
+                <label htmlFor='uad' className='block text-sm font-semibold text-gray-900 mb-4'>
                     UAD
                 </label>
                 <div className='space-y-4 mt-2'>
@@ -37,10 +34,7 @@ export const ReportAttendanceFilter = () => {
 
             {/* Periodo de nómina */}
             <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-                <label
-                    htmlFor='payroll'
-                    className='block text-sm font-semibold text-gray-900 mb-4'
-                >
+                <label htmlFor='payroll' className='block text-sm font-semibold text-gray-900 mb-4'>
                     Periodo de nómina
                 </label>
                 <PayrollPeriodSelector
@@ -59,10 +53,7 @@ export const ReportAttendanceFilter = () => {
 
             {/* Seleccionar líder */}
             <div className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow'>
-                <label
-                    htmlFor='leader'
-                    className='block text-sm font-semibold text-gray-900 mb-4'
-                >
+                <label htmlFor='leader' className='block text-sm font-semibold text-gray-900 mb-4'>
                     Seleccionar líder
                 </label>
                 <div className='space-y-2'>
@@ -79,9 +70,7 @@ export const ReportAttendanceFilter = () => {
                             label: leader.name,
                         }))}
                         placeholder='Buscar líder...'
-                        disabled={
-                            !selectedUad || loadingLeaders || leaders.length === 0
-                        }
+                        disabled={!selectedUad || loadingLeaders || leaders.length === 0}
                         noOptionsText='No se encontraron líderes'
                     />
                 </div>

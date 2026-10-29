@@ -90,10 +90,7 @@ export const useReportAttendance = () => {
             const worksheet = XLSX.utils.json_to_sheet(exportData)
             const workbook = XLSX.utils.book_new()
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Asistencia')
-            XLSX.writeFile(
-                workbook,
-                `reporte_asistencia_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`,
-            )
+            XLSX.writeFile(workbook, `reporte_asistencia_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`)
         })
     }, [filteredData])
 

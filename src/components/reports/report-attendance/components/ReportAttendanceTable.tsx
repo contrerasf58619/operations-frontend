@@ -89,9 +89,7 @@ export const ReportAttendanceTable = () => {
                     <div className='flex items-center gap-2'>
                         <div className='px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-medium flex items-center gap-2'>
                             <span className='text-gray-500'>Roster IDs únicos:</span>
-                            <span className='font-semibold text-gray-900'>
-                                {uniqueRosterCount}
-                            </span>
+                            <span className='font-semibold text-gray-900'>{uniqueRosterCount}</span>
                         </div>
                         <button
                             onClick={handleExportExcel}

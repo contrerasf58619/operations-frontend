@@ -3,9 +3,7 @@
 import React from 'react'
 import { ReportAttendanceFilter } from './report-attendance/components/ReportAttendanceFilter'
 import { ReportAttendanceTable } from './report-attendance/components/ReportAttendanceTable'
-import {
-    ReportAttendanceProvider,
-} from './report-attendance/context/useReportAttendanceContext'
+import { ReportAttendanceProvider } from './report-attendance/context/useReportAttendanceContext'
 
 const ReportAttendanceContent: React.FC = () => {
     return (
