@@ -28,8 +28,8 @@ export const useLeaders = (
         setLoadingLeaders(true)
         const payload: any = {
             uadId: selectedUad,
-            dateFrom: dayjs(startDate).format('YYYYMMDD'),
-            dateTo: dayjs(endDate).format('YYYYMMDD'),
+            dateFrom: dayjs(startDate).utc().locale('es').format('YYYYMMDD'),
+            dateTo: dayjs(endDate).utc().locale('es').format('YYYYMMDD'),
             rosterId: employeeCode,
         }
 
