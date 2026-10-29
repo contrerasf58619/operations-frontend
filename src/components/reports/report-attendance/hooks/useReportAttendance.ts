@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 import { ReportAttendanceRow } from '../types'
 import { SortingState } from '@tanstack/react-table'
@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { usePayrollPeriods } from '@/hooks/attendance/usePayrollPeriods'
 import { useLeaders } from '@/hooks/attendance/useLeaders'
 import { attendanceApi } from '@/api'
+import { useCurrentAndPreviousPayrollPeriods } from '@/hooks/attendance/useCurrentAndPreviousPayrollPeriods'
 
 export const useReportAttendance = () => {
     const { employeeCode } = useGetEmployeeCode()
@@ -26,7 +27,7 @@ export const useReportAttendance = () => {
         endDate,
         setEndDate,
         loadingPayroll,
-    } = usePayrollPeriods(selectedUad, employeeCode)
+    } = useCurrentAndPreviousPayrollPeriods(selectedUad)
 
     const { leaders, selectedLeader, setSelectedLeader, loadingLeaders } = useLeaders(
         selectedUad,
@@ -39,6 +40,11 @@ export const useReportAttendance = () => {
         return data
     }, [data])
 
+    useEffect(() => {
+        setData([])
+        setSelectedLeader('')
+    }, [selectedUad, startDate])
+
     const handleSearchReports = async (leaderOverride?: string) => {
         const leader = leaderOverride ?? selectedLeader
         if (!selectedUad || !selectedPayrollPeriod || !leader) return
@@ -47,8 +53,8 @@ export const useReportAttendance = () => {
         try {
             const payload = {
                 uadId: selectedUad,
-                dateFrom: dayjs(startDate).format('YYYYMMDD'),
-                dateTo: dayjs(endDate).format('YYYYMMDD'),
+                dateFrom: dayjs(startDate).utc().locale('es').format('YYYYMMDD'),
+                dateTo: dayjs(endDate).utc().locale('es').format('YYYYMMDD'),
                 supervisor: leader,
             }
 
