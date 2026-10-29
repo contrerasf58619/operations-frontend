@@ -8,7 +8,9 @@ const ReportAttendanceContext = createContext<ReportAttendanceContextType | null
 export const ReportAttendanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const value = useReportAttendance()
     return (
-        <ReportAttendanceContext.Provider value={value}>{children}</ReportAttendanceContext.Provider>
+        <ReportAttendanceContext.Provider value={value}>
+            {children}
+        </ReportAttendanceContext.Provider>
     )
 }
 
