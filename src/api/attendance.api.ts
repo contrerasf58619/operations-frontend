@@ -55,4 +55,12 @@ export const attendanceApi = {
         const route = baseURL(api, 'attendances/save-attendances')
         return axios.post(route, data, { headers: getHeaders() })
     },
+
+    getReportAttendancesByDateAndSupervisor(payload = {}) {
+        const route = baseURL(
+            api,
+            'attendances/get-report-attendances-by-date-range-and-supervisor',
+        )
+        return axios.get(route, { headers: getHeaders(), params: payload })
+    },
 }
