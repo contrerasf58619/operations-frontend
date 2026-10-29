@@ -27,7 +27,7 @@ export const useCurrentAndPreviousPayrollPeriods = (selectedUad: string) => {
         attendanceApi
             .getCurrentAndPreviousPayroll({ uadId: selectedUad, limit: 2 })
             .then(res => {
-                const data = res.data || []
+                const data = (res.data || []).sort((a, b) => (a.date_from > b.date_from ? 1 : -1))
                 setPayrollPeriods(data)
                 if (data.length > 0) {
                     setSelectedPayrollPeriod({

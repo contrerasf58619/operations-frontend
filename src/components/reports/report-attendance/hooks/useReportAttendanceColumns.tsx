@@ -9,12 +9,12 @@ export const useReportAttendanceColumns = () => {
             {
                 accessorKey: 'roster_id',
                 header: 'Roster ID',
-                size: 120,
+                size: 80,
             },
             {
                 accessorKey: 'fecha',
                 header: 'Fecha',
-                size: 120,
+                size: 80,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val ? dayjs(val).utc().locale('es').format('DD/MM/YYYY') : '-'
@@ -23,12 +23,12 @@ export const useReportAttendanceColumns = () => {
             {
                 accessorKey: 'asistencia',
                 header: 'Asistencia',
-                size: 140,
+                size: 80,
             },
             {
                 accessorKey: 'pase',
                 header: 'Pase',
-                size: 120,
+                size: 80,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
@@ -37,7 +37,16 @@ export const useReportAttendanceColumns = () => {
             {
                 accessorKey: 'ajuste',
                 header: 'Ajuste',
-                size: 120,
+                size: 80,
+                cell: ({ getValue }) => {
+                    const val = getValue() as string
+                    return val || '-'
+                },
+            },
+            {
+                accessorKey: 'asistencia_final',
+                header: 'Asistencia final',
+                size: 80,
                 cell: ({ getValue }) => {
                     const val = getValue() as string
                     return val || '-'
