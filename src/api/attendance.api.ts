@@ -41,6 +41,11 @@ export const attendanceApi = {
         return axios.get<PayrollPeriod[]>(route, { headers: getHeaders(), params: payload })
     },
 
+    getCurrentAndPreviousPayroll(payload = {}) {
+        const route = baseURL(api, 'attendances/get-current-and-previuos-payrolls')
+        return axios.get<PayrollPeriod[]>(route, { headers: getHeaders(), params: payload })
+    },
+
     getAttendanceTypes(payload = {}) {
         const route = baseURL(api, 'attendances/get-attendance-types')
         return axios.get(route, { headers: getHeaders(), params: payload })
