@@ -19,11 +19,7 @@ import {
 } from '@/hooks/useAlerts'
 
 type CuentaTab =
-    | 'extras-simples'
-    | 'ddd-asuetos'
-    | 'extras-wp'
-    | 'total-extras-simples'
-    | 'extras-nocturno'
+    'extras-simples' | 'ddd-asuetos' | 'extras-wp' | 'total-extras-simples' | 'extras-nocturno'
 
 interface CuentaReportProps {
     /** `null` mientras no haya UAD y nómina seleccionadas: los hooks no disparan. */
