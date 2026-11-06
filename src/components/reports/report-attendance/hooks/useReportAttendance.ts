@@ -42,6 +42,7 @@ export const useReportAttendance = () => {
     useEffect(() => {
         setData([])
         setSelectedLeader('')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedUad, startDate])
 
     const handleSearchReports = async (leaderOverride?: string) => {
