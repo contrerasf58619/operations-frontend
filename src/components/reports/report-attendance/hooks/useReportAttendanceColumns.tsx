@@ -24,6 +24,10 @@ export const useReportAttendanceColumns = () => {
                 accessorKey: 'asistencia',
                 header: 'Asistencia',
                 size: 80,
+                cell: ({ getValue }) => {
+                    const val = getValue() as string
+                    return val || '-'
+                },
             },
             {
                 accessorKey: 'pase',
