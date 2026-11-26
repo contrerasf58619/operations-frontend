@@ -41,16 +41,19 @@ export const AgentsNoAttendanceModal = () => {
 
     return (
         <div
-            className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4'
+            className='fixed inset-0 z-50 flex items-center justify-center p-4'
             role='dialog'
             aria-modal='true'
             aria-labelledby='agents-no-attendance-modal-title'
-            onClick={handleCloseSupervisorDetail}
         >
-            <div
-                className='relative w-full max-w-3xl rounded-xl bg-white shadow-xl border border-gray-200 flex flex-col max-h-[85vh]'
-                onClick={e => e.stopPropagation()}
-            >
+            <button
+                type='button'
+                aria-label='Cerrar modal'
+                tabIndex={-1}
+                onClick={handleCloseSupervisorDetail}
+                className='absolute inset-0 bg-gray-900/50 cursor-default'
+            />
+            <div className='relative z-10 w-full max-w-3xl rounded-xl bg-white shadow-xl border border-gray-200 flex flex-col max-h-[85vh]'>
                 <div className='flex items-start justify-between gap-4 px-6 py-4 border-b border-gray-200'>
                     <div>
                         <h3
