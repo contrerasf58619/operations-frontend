@@ -5,9 +5,7 @@ type NoTakeAttendanceContextType = ReturnType<typeof useNoTakeAttendance>
 
 const NoTakeAttendanceContext = createContext<NoTakeAttendanceContextType | null>(null)
 
-export const NoTakeAttendanceProvider: React.FC<{ children: React.ReactNode }> = ({
-    children,
-}) => {
+export const NoTakeAttendanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const value = useNoTakeAttendance()
     return (
         <NoTakeAttendanceContext.Provider value={value}>
@@ -19,9 +17,7 @@ export const NoTakeAttendanceProvider: React.FC<{ children: React.ReactNode }> =
 export const useNoTakeAttendanceContext = () => {
     const context = useContext(NoTakeAttendanceContext)
     if (!context) {
-        throw new Error(
-            'useNoTakeAttendanceContext must be used within a NoTakeAttendanceProvider',
-        )
+        throw new Error('useNoTakeAttendanceContext must be used within a NoTakeAttendanceProvider')
     }
     return context
 }

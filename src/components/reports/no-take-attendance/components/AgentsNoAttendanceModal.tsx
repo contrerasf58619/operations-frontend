@@ -3,12 +3,8 @@ import dayjs from 'dayjs'
 import { useNoTakeAttendanceContext } from '../context/useNoTakeAttendanceContext'
 
 export const AgentsNoAttendanceModal = () => {
-    const {
-        selectedSupervisor,
-        agentsNoAttendance,
-        loadingAgents,
-        handleCloseSupervisorDetail,
-    } = useNoTakeAttendanceContext()
+    const { selectedSupervisor, agentsNoAttendance, loadingAgents, handleCloseSupervisorDetail } =
+        useNoTakeAttendanceContext()
 
     const [search, setSearch] = useState('')
 
@@ -37,8 +33,7 @@ export const AgentsNoAttendanceModal = () => {
             item =>
                 String(item.agent_code ?? '')
                     .toLowerCase()
-                    .includes(query) ||
-                (item.agente ?? '').toLowerCase().includes(query),
+                    .includes(query) || (item.agente ?? '').toLowerCase().includes(query),
         )
     }, [agentsNoAttendance, search])
 
