@@ -27,6 +27,22 @@ export interface PayrollPeriod {
     date_to: string
 }
 
+export interface SupervisorNoTakeAttendance {
+    sup_code: number
+    name: string
+    total_agentes: string
+    agentes_sin_asistencia: string
+    dias_sin_asistencia: string
+}
+
+export interface AgentsNoAttendance {
+    sup_code: number
+    lider: string
+    agent_code: number | string
+    agente: string
+    fecha_sin_asistencia: string
+}
+
 export const attendanceApi = {
     getLeaders(payload = {}) {
         const route = baseURL(api, 'attendances/get-leaders')
@@ -67,5 +83,21 @@ export const attendanceApi = {
             'attendances/get-report-attendances-by-date-range-and-supervisor',
         )
         return axios.get(route, { headers: getHeaders(), params: payload })
+    },
+
+    getSupervisorsWhoHavenotTakeAttendance(payload = {}) {
+        const route = baseURL(api, 'attendances/get-supervisor-who-havenot-take-attendances')
+        return axios.get<SupervisorNoTakeAttendance[]>(route, {
+            headers: getHeaders(),
+            params: payload,
+        })
+    },
+
+    getAgentsWhoHavenotAttendanceBySupervisor(payload = {}) {
+        const route = baseURL(api, 'attendances/get-agents-who-havenot-attendances-by-attendances')
+        return axios.get<AgentsNoAttendance[]>(route, {
+            headers: getHeaders(),
+            params: payload,
+        })
     },
 }
